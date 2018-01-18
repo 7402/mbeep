@@ -67,7 +67,7 @@ sudo make install
 
 ### Notes
 
-The common Unix beep tool ([https://github.com/johnath/beep/](https://github.com/johnath/beep/))does not work on
+The common Unix beep tool ([https://github.com/johnath/beep/](https://github.com/johnath/beep/)) does not work on
 the Mac, because the Mac does not have a simple piezo speaker on the motherboard. The mbeep tool uses the
 OpenAL framework, which is built into the macOS system; mbeep can also be used on Unix systems that have
 OpenAL installed.
