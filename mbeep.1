@@ -1,0 +1,185 @@
+.TH mbeep 1
+
+.SH NAME
+mbeep \- send tone or sequence of tones to audio output or .wav file
+
+.SH SYNOPSIS
+.nf
+\fBmbeep\fR [ [\fB\-o\fR \fIFILE\fR] [\fB\-f\fR \fIFREQ\fR] [\fB\-t\fR \fIMSEC\fR] [\fB\-g\fR \
+\fIMSEC\fR] [\fB\-r\fR \fIREPEATS\fR] [\fB\-p\fR] ]...
+\fBmbeep\fR [\fB\-o\fR \fIFILE\fR] [\fB\-b\fR \fIBPM\fR] [\fB\-m\fR \fITEXT\fR]
+\fBmbeep\fR [\fB\-o\fR \fIFILE\fR] [\fB\-b\fR \fIBPM\fR] \fB\-i\fR \fIFILE\fR \fB\-m\fR
+\fBmbeep\fR [\fB\-o\fR \fIFILE\fR] [\fB\-w\fR \fIWPM\fR] [\fB\-c\fR \fITEXT\fR]
+\fBmbeep\fR [\fB\-o\fR \fIFILE\fR] [\fB\-w\fR \fIWPM\fR] \fB\-i\fR \fIFILE\fR \fB\-c\fR
+\fBmbeep\fR \fB\-h\fR | \fB\-v\fR | \fB\-\-midi\-help\fR | \fB\-\-morse\-help\fR | \
+\fB\-\-license\fR | \fB\-\-man\-page\fR
+.fi
+
+.SH DESCRIPTION
+Plays a sequence of sine\-wave tones on the default audio output device or writes a sequence of
+sine\-wave tones to a .wav file.
+Runs on Mac or Linux command line. Tones can be specified by frequency and duration, MIDI notes,
+or text to be translated to Morse code.
+
+To produce a series of tones by explicitly specifying the frequency and duration of each tone, use
+the \-f and \-t options. Separate each tone description with -p (play). The \-g option specifies
+the gap to be used between each tone. The \-r option specifies how many times the tone
+is to be repeated.
+
+To produce a series of tones corresponding to musical notes, use the \-m option. To specify the
+tempo in quarter notes per minute, use the \-b option. For information about the format of the
+string describing these notes, type:
+    \fBmbeep \-\-midi\-help\fR
+
+To produce a series of tones corresponding to Morse code, use the \-c option. To specify the
+speed in words per minute, use the \-w option. For information about the format of the
+string describing these notes, type:
+    \fBmbeep \-\-morse\-help\fR
+
+To read the MIDI string or Morse code text from a file, instead by specifying on the command line,
+use the \-i option.
+
+To write the audio data to disk file in .wav format, instead of sending it to the speaker,
+use the \-o option.
+
+.SH OPTIONS
+
+.TP
+.BR \-f " " \fIFREQ\fR
+Frequency of tone in Hz. Default is 750 for code, else 440.
+
+.TP
+.BR \-t " " \fITIME\fR
+Duration of tone in msec. Default is 200.
+
+.TP
+.BR \-g " " \fIGAP\fR
+Gap between tones in msec. Default is 50.
+
+.TP
+.BR \-r " " \fIREPEATS\fR
+Number of times to repeat tone. Default is 1.
+
+.TP
+.BR \-p
+Play tone. Used when specifying sequence of multiple tones. Do not use at end of command line,
+unless you want tone to play twice.
+
+.TP
+.BR \-o " " \fIOUTPUT\fR
+Write .wav file containing tones.
+
+.TP
+.BR \-b " " \fITEMPO\fR
+Quarter notes per minute. Default is 120.
+
+.TP
+.BR \-w " " \fIWPM\fR
+Morse code speed in words per minute. Default is 20.
+
+.TP
+.BR \-i " " \fIINPUT\fR
+Input file or path for -m or -c options.
+
+.TP
+.BR \-m " " \fISTRING\fR
+Send sequence of MIDI notes specified by string.
+
+.TP
+.BR \-m
+Send sequence of MIDI notes specified by input file.
+
+.TP
+.BR \-c " " \fISTRING\fR
+Send text in string as Morse code.
+
+.TP
+.BR \-c
+Send text in input file as Morse code.
+
+.TP
+.BR \-h ", " \-\-help\fR
+Show this screen.
+
+
+.TP
+.BR \-\-version
+Show version.
+
+.TP
+.BR \-\-midi\-help
+Show information about format of MIDI string.
+
+.TP
+.BR \-\-morse\-help
+Show information about Morse code characters.
+
+.TP
+.BR \-\-license
+Show software copyright and license.
+
+.TP
+.BR \-\-man\-page
+Show source for this man page
+
+.SH EXAMPLES
+Play a sequence of tones:
+.PP
+.nf
+.RS
+\fBmbeep -t 600 -f 1174.7 -p -f 1318.5 -p -f 1046.5 -p -f 523.3 -p -t 900 -f 784.0\fR
+.RE
+.fi
+.PP
+
+Play a melody:
+.PP
+.nf
+.RS
+\fBmbeep -m "C5q C5q C5e. D5s E5q E5e. D5s E5e. F5s G5h"\fR
+.RE
+.fi
+.PP
+
+Play Morse code:
+.PP
+.nf
+.RS
+\fBmbeep -c "W1AW DE K1JMQ +"\fR
+.RE
+.fi
+.PP
+
+Play Morse code from standard input:
+.PP
+.nf
+.RS
+\fBmbeep -i /dev/stdin -c\fR
+.RE
+.fi
+.PP
+
+Write melody to .wav disk file:
+.PP
+.nf
+.RS
+\fBmbeep -o daisy.wav -b 180 -m "d6h. b5h. g5h. d5h rq e5q f#5q g5q e5h g5q d5h.h"\fR
+.RE
+.fi
+.PP
+
+.SH SEE ALSO
+.BR beep (1)
+
+.SH NOTES
+The common beep tool on Unix systems does not work on the Mac, because the Mac does not have a simple piezo
+speaker on the motherboard. The mbeep tool uses the OpenAL framework, which is built into the macOS system;
+mbeep can also be used on Unix systems that have OpenAL installed.
+
+The beep tool is good for reliable low\-level output to the motherboard speaker on Unix systems, and it does
+not depend on a sound card or higher\-level sound options or libraries. The mbeep tool is good for sending sound to headphones
+and speakers on Mac and Unix systems.
+
+.SH AUTHOR
+Michael Budiansky \fIhttps://www.7402.org/email\fR
+
