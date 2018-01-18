@@ -32,7 +32,7 @@
 
 void version(void)
 {
-    printf("mbeep 0.9\n");
+    printf("mbeep 0.9.1\n");
 }
 
 void usage(void)
@@ -327,7 +327,7 @@ void man_page_source(void)
            "\n"
            ".TP\n"
            ".BR \\-h \", \" \\-\\-help\\fR\n"
-           "Show this screen.\n"
+           "Show help message.\n"
            "\n"
            "\n"
            ".TP\n"
