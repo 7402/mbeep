@@ -47,8 +47,7 @@ int main(int argc, const char * argv[]) {
     int repeats = 1;
     double gap = 50.0;
     double bpm = 120.0;
-    double wpm = 20.0;
-    double dit = 1200.0 / wpm;
+    double dit = 1200.0 / 20.0;     // 20 wpm PARIS standard
     bool do_final_play = true;
 
     FILE *in_file = NULL;
@@ -126,12 +125,19 @@ int main(int argc, const char * argv[]) {
             in_file = NULL;
             do_final_play = false;
 
-        //  -w  words per minute
-        } else if (strcmp(argv[index], "-w") == 0 && index + 1 < argc) {
-            wpm = atof(argv[++index]);
-            dit = 1200.0 / wpm;
+        //  -w  --paris-wpm words per minute, PARIS standard
+        } else if (((strcmp(argv[index], "--paris-wpm") == 0) ||
+                    (strcmp(argv[index], "-w") == 0)) && index + 1 < argc) {
+            double wpm = atof(argv[++index]);
+            dit = 60.0 * 1000.0 / (50.0 * wpm);
             if (wpm < 5.0 || wpm > 60.0) error = SE_INVALID_WPM;
-
+            
+        //  --codex-wpm  words per minute, CODEX standard
+        } else if (strcmp(argv[index], "--codex-wpm") == 0 && index + 1 < argc) {
+            double wpm = atof(argv[++index]);
+            dit = 60.0 * 1000.0 / (60.0 * wpm);
+            if (wpm < 5.0 || wpm > 60.0) error = SE_INVALID_WPM;
+            
         //  -c  string to send as Morse code
         } else if (strcmp(argv[index], "-c") == 0 && index + 1 < argc) {
             if (needs_init) {
