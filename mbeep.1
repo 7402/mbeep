@@ -74,8 +74,12 @@ Write .wav file containing tones.
 Quarter notes per minute. Default is 120.
 
 .TP
-.BR \-w " " \fIWPM\fR
-Morse code speed in words per minute. Default is 20.
+.BR \-w ", " \-\-paris\-wpm " " \fIWPM\fR
+Morse code speed in words per minute (PARIS standard). Default is 20.
+
+.TP
+.BR \-\-codex\-wpm " " \fIWPM\fR
+Morse code speed in words per minute (CODEX standard). Default is 16 2/3.
 
 .TP
 .BR \-i " " \fIINPUT\fR
@@ -101,9 +105,8 @@ Send text in input file as Morse code.
 .BR \-h ", " \-\-help\fR
 Show help message.
 
-
 .TP
-.BR \-\-version
+.BR \-v ", " \-\-version
 Show version.
 
 .TP
@@ -180,6 +183,9 @@ The beep tool is good for reliable low\-level output to the motherboard speaker 
 not depend on a sound card or higher\-level sound options or libraries. The mbeep tool is good for sending sound to headphones
 and speakers on Mac and Unix systems.
 
+The PARIS standard for words per minute speed assumes each word is the same length in Morse code as the word PARIS. This is the most common standard for code speed and is appropriate for plain\-language text.
+
+The CODEX standard for words per minute speed assumes each word is the same length in Morse code as the word CODEX. This standard is appropriate for calculating speed for five\-letter code groups.
+
 .SH AUTHOR
 Michael Budiansky \fIhttps://www.7402.org/email\fR
-
