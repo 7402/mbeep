@@ -47,7 +47,7 @@ SoundError play(double freq, double msec, double gap, int repeats, FILE *out_fil
 SoundError play_midi(double bpm, double gap, const char *text, FILE *out_file)
 {
     SoundError error = SE_NO_ERROR;
-    char *str = (char *)malloc(strlen(text + 1));
+    char *str = (char *)malloc(strlen(text) + 1);
 
     if (str == NULL) {
         error = SE_OUT_OF_MEMORY;
@@ -64,6 +64,10 @@ SoundError play_midi(double bpm, double gap, const char *text, FILE *out_file)
             double freq = 0.0;
             bool is_rest = false;
             double msec = 0.0;
+
+#if DEBUG
+            printf("[%s]\n", token);
+#endif
 
             // rest
             if (*cp == 'r' || *cp == 'R') {

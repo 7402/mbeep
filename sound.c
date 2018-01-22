@@ -309,8 +309,9 @@ SoundError finish_wave_file(FILE *file)
     
     // go back to end of file
     fseek(file, offset, SEEK_SET);
-    fclose(file);
 
+    // caller must close file!
+    
     return error;
 }
 
