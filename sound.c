@@ -482,5 +482,3 @@ void close_sound(void)
 
     init_OK = false;
 }
-
-

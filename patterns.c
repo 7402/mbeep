@@ -336,4 +336,3 @@ SoundError play_code(double freq, double dit, bool paris_standard, double farnsw
 
     return SE_NO_ERROR;
 }
-

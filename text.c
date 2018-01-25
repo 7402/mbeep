@@ -425,4 +425,3 @@ void man_page_source(void)
            "Michael Budiansky \\fIhttps://www.7402.org/email\\fR\n"
            "\n");
 }
-
