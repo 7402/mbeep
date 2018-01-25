@@ -320,6 +320,10 @@ SoundError finish_wave_file(FILE *file)
 // write .wav file data
 SoundError fill_file(double freq, double msec, FILE *file)
 {
+#if DEBUG
+    printf("fill_file(%f, %f)\n", freq, msec);
+#endif
+
     SoundError error = SE_NO_ERROR;
 
     size_t total = (size_t)(0.001 * msec * SAMPLES_PER_SECOND);
@@ -331,11 +335,18 @@ SoundError fill_file(double freq, double msec, FILE *file)
 
     int16_t buffer[BUF_SIZE];
 
+#if DEBUG
+    printf("  total = %ld\n", total);
+#endif
+
     while (remaining > 0 && error == SE_NO_ERROR) {
         size_t count = remaining < BUF_SIZE ? remaining : BUF_SIZE;
 
-        write_data(buffer,  freq, ramp, total, index, count);
+        write_data(buffer, freq, ramp, total, index, count);
         fwrite(buffer, sizeof(int16_t), count, file);
+#if DEBUG
+        printf("  fwrite %ld\n", count);
+#endif
 
         index += count;
         remaining -= count;

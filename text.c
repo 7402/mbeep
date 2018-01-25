@@ -32,7 +32,7 @@
 
 void version(void)
 {
-    printf("mbeep 0.9.1\n");
+    printf("mbeep 0.9.2\n");
 }
 
 void usage(void)
@@ -63,6 +63,7 @@ void usage(void)
            "  -b <tempo>        Quarter notes per minute [default: 120]\n"
            "  -w <wpm>          Morse code speed in PARIS words per minute [default: 20]\n"
            "  --codex-wpm <wpm> Morse code speed in CODEX words per minute [default: 16 2/3]\n"
+           "  -x <speed>        Character speed for Farnsworth Morse code timing\n"
            "  -i <input>        Input file or path for -m or -c options\n"
            "  -m <string>       Send sequence of MIDI notes specified by string\n"
            "  -m                Send sequence of MIDI notes specified by input file\n"
@@ -236,10 +237,10 @@ void man_page_source(void)
            ".nf\n"
            "\\fBmbeep\\fR [ [\\fB\\-o\\fR \\fIFILE\\fR] [\\fB\\-f\\fR \\fIFREQ\\fR] [\\fB\\-t\\fR \\fIMSEC\\fR] [\\fB\\-g\\fR \\\n"
            "\\fIMSEC\\fR] [\\fB\\-r\\fR \\fIREPEATS\\fR] [\\fB\\-p\\fR] ]...\n"
-           "\\fBmbeep\\fR [\\fB\\-o\\fR \\fIFILE\\fR] [\\fB\\-b\\fR \\fIBPM\\fR] [\\fB\\-m\\fR \\fITEXT\\fR]\n"
+           "\\fBmbeep\\fR [\\fB\\-o\\fR \\fIFILE\\fR] [\\fB\\-b\\fR \\fIBPM\\fR] \\fB\\-m\\fR \\fITEXT\\fR\n"
            "\\fBmbeep\\fR [\\fB\\-o\\fR \\fIFILE\\fR] [\\fB\\-b\\fR \\fIBPM\\fR] \\fB\\-i\\fR \\fIFILE\\fR \\fB\\-m\\fR\n"
-           "\\fBmbeep\\fR [\\fB\\-o\\fR \\fIFILE\\fR] [\\fB\\-w\\fR \\fIWPM\\fR] [\\fB\\-c\\fR \\fITEXT\\fR]\n"
-           "\\fBmbeep\\fR [\\fB\\-o\\fR \\fIFILE\\fR] [\\fB\\-w\\fR \\fIWPM\\fR] \\fB\\-i\\fR \\fIFILE\\fR \\fB\\-c\\fR\n"
+           "\\fBmbeep\\fR [\\fB\\-o\\fR \\fIFILE\\fR] [\\fB\\-w\\fR \\fIWPM\\fR] [\\fB\\-x\\fR \\fICHAR_SPEED\\fR] \\fB\\-c\\fR \\fITEXT\\fR\n"
+           "\\fBmbeep\\fR [\\fB\\-o\\fR \\fIFILE\\fR] [\\fB\\-w\\fR \\fIWPM\\fR] [\\fB\\-x\\fR \\fICHAR_SPEED\\fR] \\fB\\-i\\fR \\fIFILE\\fR \\fB\\-c\\fR\n"
            "\\fBmbeep\\fR \\fB\\-h\\fR | \\fB\\-v\\fR | \\fB\\-\\-midi\\-help\\fR | \\fB\\-\\-morse\\-help\\fR | \\\n"
            "\\fB\\-\\-license\\fR | \\fB\\-\\-man\\-page\\fR\n"
            ".fi\n"
@@ -309,6 +310,10 @@ void man_page_source(void)
            ".TP\n"
            ".BR \\-\\-codex\\-wpm \" \" \\fIWPM\\fR\n"
            "Morse code speed in words per minute (CODEX standard). Default is 16 2/3.\n"
+           "\n"
+           ".TP\n"
+           ".BR \\-x \", \" \\-\\-farnsworth \" \" \\fICHAR_SPEED\\fR\n"
+           "Character speed for Farnsworth Morse code timing. Default is same as words per minute.\n"
            "\n"
            ".TP\n"
            ".BR \\-i \" \" \\fIINPUT\\fR\n"

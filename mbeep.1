@@ -7,10 +7,10 @@ mbeep \- send tone or sequence of tones to audio output or .wav file
 .nf
 \fBmbeep\fR [ [\fB\-o\fR \fIFILE\fR] [\fB\-f\fR \fIFREQ\fR] [\fB\-t\fR \fIMSEC\fR] [\fB\-g\fR \
 \fIMSEC\fR] [\fB\-r\fR \fIREPEATS\fR] [\fB\-p\fR] ]...
-\fBmbeep\fR [\fB\-o\fR \fIFILE\fR] [\fB\-b\fR \fIBPM\fR] [\fB\-m\fR \fITEXT\fR]
+\fBmbeep\fR [\fB\-o\fR \fIFILE\fR] [\fB\-b\fR \fIBPM\fR] \fB\-m\fR \fITEXT\fR
 \fBmbeep\fR [\fB\-o\fR \fIFILE\fR] [\fB\-b\fR \fIBPM\fR] \fB\-i\fR \fIFILE\fR \fB\-m\fR
-\fBmbeep\fR [\fB\-o\fR \fIFILE\fR] [\fB\-w\fR \fIWPM\fR] [\fB\-c\fR \fITEXT\fR]
-\fBmbeep\fR [\fB\-o\fR \fIFILE\fR] [\fB\-w\fR \fIWPM\fR] \fB\-i\fR \fIFILE\fR \fB\-c\fR
+\fBmbeep\fR [\fB\-o\fR \fIFILE\fR] [\fB\-w\fR \fIWPM\fR] [\fB\-x\fR \fICHAR_SPEED\fR] \fB\-c\fR \fITEXT\fR
+\fBmbeep\fR [\fB\-o\fR \fIFILE\fR] [\fB\-w\fR \fIWPM\fR] [\fB\-x\fR \fICHAR_SPEED\fR] \fB\-i\fR \fIFILE\fR \fB\-c\fR
 \fBmbeep\fR \fB\-h\fR | \fB\-v\fR | \fB\-\-midi\-help\fR | \fB\-\-morse\-help\fR | \
 \fB\-\-license\fR | \fB\-\-man\-page\fR
 .fi
@@ -80,6 +80,10 @@ Morse code speed in words per minute (PARIS standard). Default is 20.
 .TP
 .BR \-\-codex\-wpm " " \fIWPM\fR
 Morse code speed in words per minute (CODEX standard). Default is 16 2/3.
+
+.TP
+.BR \-x ", " \-\-farnsworth " " \fICHAR_SPEED\fR
+Character speed for Farnsworth Morse code timing.
 
 .TP
 .BR \-i " " \fIINPUT\fR

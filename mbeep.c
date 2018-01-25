@@ -33,10 +33,8 @@
 #include "sound.h"
 #include "text.h"
 
-#define DEFAULT -1
-#define DEFAULT_BEEP_FREQ 440.0
-#define DEFAULT_CODE_FREQ 750.0
 #define LINE_SIZE 1024
+#define DEFAULT_WPM 20.0
 
 int main(int argc, const char * argv[]) {
     SoundError error = SE_NO_ERROR;
@@ -47,7 +45,10 @@ int main(int argc, const char * argv[]) {
     int repeats = 1;
     double gap = 50.0;
     double bpm = 120.0;
-    double dit = 1200.0 / 20.0;     // 20 wpm PARIS standard
+    bool paris_standard = true;
+    double dit = 1200.0 / DEFAULT_WPM;  // 20 wpm PARIS standard
+    double word_speed = DEFAULT_WPM;
+    double char_speed = DEFAULT;    // Farnsworth speed
     bool do_final_play = true;
 
     FILE *in_file = NULL;
@@ -82,7 +83,6 @@ int main(int argc, const char * argv[]) {
                 needs_init = false;
             }
 
-            if (freq == DEFAULT) freq = DEFAULT_BEEP_FREQ;
             if (error == SE_NO_ERROR) error = play(freq, msec, gap, repeats, out_file);
 
         //  -b  beats (quarter notes) per minute
@@ -128,15 +128,23 @@ int main(int argc, const char * argv[]) {
         //  -w  --paris-wpm words per minute, PARIS standard
         } else if (((strcmp(argv[index], "--paris-wpm") == 0) ||
                     (strcmp(argv[index], "-w") == 0)) && index + 1 < argc) {
-            double wpm = atof(argv[++index]);
-            dit = 60.0 * 1000.0 / (50.0 * wpm);
-            if (wpm < 5.0 || wpm > 60.0) error = SE_INVALID_WPM;
+            word_speed = atof(argv[++index]);
+            paris_standard = true;
+            dit = 60.0 * 1000.0 / (50.0 * word_speed);
+            if (word_speed < 5.0 || word_speed > 60.0) error = SE_INVALID_WPM;
             
         //  --codex-wpm  words per minute, CODEX standard
         } else if (strcmp(argv[index], "--codex-wpm") == 0 && index + 1 < argc) {
-            double wpm = atof(argv[++index]);
-            dit = 60.0 * 1000.0 / (60.0 * wpm);
-            if (wpm < 5.0 || wpm > 60.0) error = SE_INVALID_WPM;
+            word_speed = atof(argv[++index]);
+            paris_standard = false;
+            dit = 60.0 * 1000.0 / (60.0 * word_speed);
+            if (word_speed < 5.0 || word_speed > 60.0) error = SE_INVALID_WPM;
+            
+        //  -x  --farnsworth character speed
+        } else if (((strcmp(argv[index], "--farnsworth") == 0) ||
+                    (strcmp(argv[index], "-x") == 0)) && index + 1 < argc) {
+            char_speed = atof(argv[++index]);
+            if (char_speed < 5.0 || char_speed > 60.0) error = SE_INVALID_WPM;
             
         //  -c  string to send as Morse code
         } else if (strcmp(argv[index], "-c") == 0 && index + 1 < argc) {
@@ -144,9 +152,14 @@ int main(int argc, const char * argv[]) {
                 error = init_sound();
                 needs_init = false;
             }
+            
+            double farnsworth_ratio = char_speed == DEFAULT ? 1.0 : word_speed / char_speed;
+            if (farnsworth_ratio > 1.0) error = SE_INVALID_WPM;
 
-            if (freq == DEFAULT) freq = DEFAULT_CODE_FREQ;
-            if (error == SE_NO_ERROR) error = play_code(freq, dit, argv[++index], out_file);
+            if (error == SE_NO_ERROR) {
+                const char *text = argv[++index];
+                error = play_code(freq, dit, paris_standard, farnsworth_ratio, text, out_file);
+            }
 
             do_final_play = false;
 
@@ -157,10 +170,11 @@ int main(int argc, const char * argv[]) {
                 needs_init = false;
             }
 
-            if (freq == DEFAULT) freq = DEFAULT_CODE_FREQ;
+            double farnsworth_ratio = char_speed == DEFAULT ? 1.0 : word_speed / char_speed;
+            if (farnsworth_ratio > 1.0) error = SE_INVALID_OPTION;
 
             while (error == SE_NO_ERROR && fgets(line, LINE_SIZE, in_file) != NULL) {
-                error = play_code(freq, dit, line, out_file);
+                error = play_code(freq, dit, paris_standard, farnsworth_ratio, line, out_file);
 
                 if (error == SE_NO_ERROR) error = play_buffers();
                 if (error == SE_NO_ERROR) error = wait_for_buffers();
@@ -242,7 +256,6 @@ int main(int argc, const char * argv[]) {
             needs_init = false;
         }
 
-        if (freq == DEFAULT) freq = DEFAULT_BEEP_FREQ;
         error = play(freq, msec, gap, repeats, out_file);
     }
 

@@ -31,8 +31,11 @@
 
 #include "sound.h"
 
+#define DEFAULT -1
+
 SoundError play(double freq, double msec, double gap, int repeats, FILE *out_file);
 SoundError play_midi(double bpm, double gap, const char *text, FILE *out_file);
-SoundError play_code(double freq, double dit, const char *text, FILE *out_file);
+SoundError play_code(double freq, double dit, bool paris_standard, double farnsworth_ratio,
+                     const char *text, FILE *out_file);
 
 #endif /* patterns_h */

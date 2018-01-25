@@ -32,9 +32,14 @@
 
 #include "patterns.h"
 
+#define DEFAULT_BEEP_FREQ 440.0
+#define DEFAULT_CODE_FREQ 750.0
+
 // play tone followed by gap
 SoundError play(double freq, double msec, double gap, int repeats, FILE *out_file)
 {
+    if (freq == DEFAULT) freq = DEFAULT_BEEP_FREQ;
+
     for (int k = 0; k < repeats; k++) {
         fill_buffer_or_file(freq, msec, out_file);
         fill_buffer_or_file(SILENCE, gap, out_file);
@@ -194,10 +199,29 @@ SoundError play_midi(double bpm, double gap, const char *text, FILE *out_file)
     return error;
 }
 
-SoundError play_code(double freq, double dit, const char *text, FILE *out_file)
+SoundError play_code(double freq, double dit, bool paris_standard, double farnsworth_ratio,
+                     const char *text, FILE *out_file)
 {
     bool was_space = false;
     bool is_space = false;
+
+    if (freq == DEFAULT) freq = DEFAULT_CODE_FREQ;
+    
+    double char_dit = dit * farnsworth_ratio;
+    double gap_dit;
+    
+    #define GAP_DITS 19
+    #define PARIS_DITS 50
+    #define CODEX_DITS 60
+
+    if (paris_standard) {
+        double extra = (PARIS_DITS - GAP_DITS) * (dit - char_dit);
+        gap_dit = dit + extra / GAP_DITS;
+        
+    } else {
+        double extra = (CODEX_DITS - GAP_DITS) * (dit - char_dit);
+        gap_dit = dit + extra / GAP_DITS;
+    }
 
     for (int k = 0; k < strlen(text); k++) {
         unsigned char c = (unsigned char)toupper(text[k]);
@@ -294,18 +318,18 @@ SoundError play_code(double freq, double dit, const char *text, FILE *out_file)
 
         for (int i = 0; i < strlen(sequence); i++) {
             if (sequence[i] == '.') {
-                fill_buffer_or_file(freq, dit, out_file);
-                fill_buffer_or_file(SILENCE, dit, out_file);
+                fill_buffer_or_file(freq, char_dit, out_file);
+                fill_buffer_or_file(SILENCE, char_dit, out_file);
 
             } else {
-                fill_buffer_or_file(freq, 3 * dit, out_file);
-                fill_buffer_or_file(SILENCE, dit, out_file);
+                fill_buffer_or_file(freq, 3 * char_dit, out_file);
+                fill_buffer_or_file(SILENCE, char_dit, out_file);
             }
         }
 
-        if (strlen(sequence) > 0) fill_buffer_or_file(SILENCE, 2 * dit, out_file);
+        if (strlen(sequence) > 0) fill_buffer_or_file(SILENCE, 3 * gap_dit - char_dit, out_file);
 
-        if (is_space && !was_space) fill_buffer_or_file(SILENCE, 4 * dit, out_file);
+        if (is_space && !was_space) fill_buffer_or_file(SILENCE, 4 * gap_dit, out_file);
 
         was_space = is_space;
     }
