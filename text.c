@@ -64,7 +64,8 @@ void usage(void)
            "  -w <wpm>          Morse code speed in PARIS words per minute [default: 20]\n"
            "  --codex-wpm <wpm> Morse code speed in CODEX words per minute [default: 16 2/3]\n"
            "  -x <speed>        Character speed for Farnsworth Morse code timing\n"
-           "  -i <input>        Input file or path for -m or -c options\n"
+           "  -i <input>        Input file or path for text used by -m or -c options\n"
+           "  -I                Use stdin for text used by -m or -c options\n"
            "  -m <string>       Send sequence of MIDI notes specified by string\n"
            "  -m                Send sequence of MIDI notes specified by input file\n"
            "  -c <string>       Send text in string as Morse code\n"
@@ -317,7 +318,11 @@ void man_page_source(void)
            "\n"
            ".TP\n"
            ".BR \\-i \" \" \\fIINPUT\\fR\n"
-           "Input file or path for -m or -c options.\n"
+           "Input file or path for text used by -m or -c options.\n"
+           "\n"
+           ".TP\n"
+           ".BR \\-I\n"
+           "Use stdin for text used by -m or -c options.\n"
            "\n"
            ".TP\n"
            ".BR \\-m \" \" \\fISTRING\\fR\n"
@@ -391,7 +396,7 @@ void man_page_source(void)
            ".PP\n"
            ".nf\n"
            ".RS\n"
-           "\\fBmbeep -i /dev/stdin -c\\fR\n"
+           "\\fBmbeep -I -c\\fR\n"
            ".RE\n"
            ".fi\n"
            ".PP\n"
@@ -425,3 +430,4 @@ void man_page_source(void)
            "Michael Budiansky \\fIhttps://www.7402.org/email\\fR\n"
            "\n");
 }
+

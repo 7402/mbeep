@@ -83,11 +83,15 @@ Morse code speed in words per minute (CODEX standard). Default is 16 2/3.
 
 .TP
 .BR \-x ", " \-\-farnsworth " " \fICHAR_SPEED\fR
-Character speed for Farnsworth Morse code timing.
+Character speed for Farnsworth Morse code timing. Default is same as words per minute.
 
 .TP
 .BR \-i " " \fIINPUT\fR
-Input file or path for -m or -c options.
+Input file or path for text used by -m or -c options.
+
+.TP
+.BR \-I
+Use stdin for text used by -m or -c options.
 
 .TP
 .BR \-m " " \fISTRING\fR
@@ -161,7 +165,7 @@ Play Morse code from standard input:
 .PP
 .nf
 .RS
-\fBmbeep -i /dev/stdin -c\fR
+\fBmbeep -I -c\fR
 .RE
 .fi
 .PP
@@ -193,3 +197,4 @@ The CODEX standard for words per minute speed assumes each word is the same leng
 
 .SH AUTHOR
 Michael Budiansky \fIhttps://www.7402.org/email\fR
+

@@ -121,7 +121,7 @@ int main(int argc, const char * argv[]) {
                 error = SE_FILE_READ_ERROR;
             }
 
-            fclose(in_file);
+            if (in_file != stdin) fclose(in_file);
             in_file = NULL;
             do_final_play = false;
 
@@ -184,12 +184,12 @@ int main(int argc, const char * argv[]) {
                 error = SE_FILE_READ_ERROR;
             }
 
-            fclose(in_file);
+            if (in_file != stdin) fclose(in_file);
             in_file = NULL;
             do_final_play = false;
 
         //  -i  input file for midi or code string (/dev/stdin for standard input)
-        } else if (strcmp(argv[index], "-i") == 0 && index + 1 < argc && in_file == NULL) {
+        } else if (strcmp(argv[index], "-i") == 0 && index + 1 < argc) {
             if (in_file != NULL) {
                 error = SE_FILE_ALREADY_OPEN_ERROR;
 
@@ -201,6 +201,19 @@ int main(int argc, const char * argv[]) {
                 error = SE_INPUT_FILE_OPEN_ERROR;
             }
 
+        //  -I  use stdin for midi or code string (same as -i /dev/stdin)
+        } else if (strcmp(argv[index], "-I") == 0) {
+            if (in_file != NULL) {
+                error = SE_FILE_ALREADY_OPEN_ERROR;
+                
+            } else {
+                in_file = stdin;
+            }
+            
+            if (in_file == NULL) {
+                error = SE_INPUT_FILE_OPEN_ERROR;
+            }
+            
         //  -o  output file for .wav
         } else if (strcmp(argv[index], "-o") == 0 && index + 1 < argc && out_file == NULL) {
             out_file = fopen(argv[++index], "w");
@@ -263,7 +276,7 @@ int main(int argc, const char * argv[]) {
     wait_for_buffers();
 
     if (in_file != NULL) {
-        fclose(in_file);
+        if (in_file != stdin) fclose(in_file);
         in_file = NULL;
     }
 
