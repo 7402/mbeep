@@ -204,12 +204,14 @@ SoundError play_code(double freq, double dit, bool paris_standard, double farnsw
 {
     bool was_space = false;
     bool is_space = false;
+    bool no_letter_gap = false;
+    int dit_tone_count = 0;
 
     if (freq == DEFAULT) freq = DEFAULT_CODE_FREQ;
-    
+
     double char_dit = dit * farnsworth_ratio;
     double gap_dit;
-    
+
     #define GAP_DITS 19
     #define PARIS_DITS 50
     #define CODEX_DITS 60
@@ -217,7 +219,7 @@ SoundError play_code(double freq, double dit, bool paris_standard, double farnsw
     if (paris_standard) {
         double extra = (PARIS_DITS - GAP_DITS) * (dit - char_dit);
         gap_dit = dit + extra / GAP_DITS;
-        
+
     } else {
         double extra = (CODEX_DITS - GAP_DITS) * (dit - char_dit);
         gap_dit = dit + extra / GAP_DITS;
@@ -230,6 +232,12 @@ SoundError play_code(double freq, double dit, bool paris_standard, double farnsw
         sequence[0] = '\0';
 
         is_space = false;
+
+        if (dit_tone_count > 0 && c != '\\') {
+            fill_buffer_or_file(freq, dit_tone_count * char_dit, out_file);
+            dit_tone_count = 0;
+        }
+
         switch (c) {
             // letters
             case 'A':   strcpy(sequence, ".-");     break;
@@ -313,25 +321,60 @@ SoundError play_code(double freq, double dit, bool paris_standard, double farnsw
             case '|':   strcpy(sequence, ".-.-");       break;  // <AA>
             case '%':   strcpy(sequence, "-.--.");      break;  // <KN>
 
+            // control characters, represented by unused character assignments
+            case '<':
+                // start no letter gap
+                no_letter_gap = true;
+                break;
+            case '>':
+                // end no letter gap
+                no_letter_gap = false;
+                strcpy(sequence, " ");
+                break;
+            case '`':
+                // add dit-length gap
+                fill_buffer_or_file(SILENCE, char_dit, out_file);
+                break;
+            case '\\':
+                // add dit-length tone
+                dit_tone_count++;
+                break;
+            case '~':
+                // 1 sec gap
+                strcpy(sequence, "~");
+                break;
+
             default:    is_space = true;            break;
         }
 
         for (int i = 0; i < strlen(sequence); i++) {
-            if (sequence[i] == '.') {
+            if (sequence[i] == '~') {
+                fill_buffer_or_file(SILENCE, 1000.0, out_file);
+
+            } else if (sequence[i] == '.') {
                 fill_buffer_or_file(freq, char_dit, out_file);
                 fill_buffer_or_file(SILENCE, char_dit, out_file);
 
-            } else {
+            } else if (sequence[i] == '-') {
                 fill_buffer_or_file(freq, 3 * char_dit, out_file);
                 fill_buffer_or_file(SILENCE, char_dit, out_file);
             }
         }
 
-        if (strlen(sequence) > 0) fill_buffer_or_file(SILENCE, 3 * gap_dit - char_dit, out_file);
+        if (!no_letter_gap && strlen(sequence) > 0) {
+            fill_buffer_or_file(SILENCE, 3 * gap_dit - char_dit, out_file);
+        }
 
-        if (is_space && !was_space) fill_buffer_or_file(SILENCE, 4 * gap_dit, out_file);
+        if (is_space && !was_space) {
+            fill_buffer_or_file(SILENCE, 4 * gap_dit, out_file);
+        }
 
         was_space = is_space;
+    }
+
+    if (dit_tone_count > 0) {
+        fill_buffer_or_file(freq, dit_tone_count * char_dit, out_file);
+        dit_tone_count = 0;
     }
 
     return SE_NO_ERROR;

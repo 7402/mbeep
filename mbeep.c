@@ -50,6 +50,7 @@ int main(int argc, const char * argv[]) {
     double word_speed = DEFAULT_WPM;
     double char_speed = DEFAULT;    // Farnsworth speed
     bool do_final_play = true;
+    bool echo = false;
 
     FILE *in_file = NULL;
     FILE *out_file = NULL;
@@ -115,6 +116,11 @@ int main(int argc, const char * argv[]) {
 
                 if (error == SE_NO_ERROR) error = play_buffers();
                 if (error == SE_NO_ERROR) error = wait_for_buffers();
+
+                if (echo) {
+                    printf("%s", line);
+                    fflush(stdout);
+                }
             }
 
             if (error == SE_NO_ERROR && ferror(in_file) != 0) {
@@ -132,27 +138,27 @@ int main(int argc, const char * argv[]) {
             paris_standard = true;
             dit = 60.0 * 1000.0 / (50.0 * word_speed);
             if (word_speed < 5.0 || word_speed > 60.0) error = SE_INVALID_WPM;
-            
+
         //  --codex-wpm  words per minute, CODEX standard
         } else if (strcmp(argv[index], "--codex-wpm") == 0 && index + 1 < argc) {
             word_speed = atof(argv[++index]);
             paris_standard = false;
             dit = 60.0 * 1000.0 / (60.0 * word_speed);
             if (word_speed < 5.0 || word_speed > 60.0) error = SE_INVALID_WPM;
-            
+
         //  -x  --farnsworth character speed
         } else if (((strcmp(argv[index], "--farnsworth") == 0) ||
                     (strcmp(argv[index], "-x") == 0)) && index + 1 < argc) {
             char_speed = atof(argv[++index]);
             if (char_speed < 5.0 || char_speed > 60.0) error = SE_INVALID_WPM;
-            
+
         //  -c  string to send as Morse code
         } else if (strcmp(argv[index], "-c") == 0 && index + 1 < argc) {
             if (needs_init) {
                 error = init_sound();
                 needs_init = false;
             }
-            
+
             double farnsworth_ratio = char_speed == DEFAULT ? 1.0 : word_speed / char_speed;
             if (farnsworth_ratio > 1.0) error = SE_INVALID_WPM;
 
@@ -178,6 +184,11 @@ int main(int argc, const char * argv[]) {
 
                 if (error == SE_NO_ERROR) error = play_buffers();
                 if (error == SE_NO_ERROR) error = wait_for_buffers();
+
+                if (echo) {
+                    printf("%s", line);
+                    fflush(stdout);
+                }
             }
 
             if (error == SE_NO_ERROR && ferror(in_file) != 0) {
@@ -205,15 +216,19 @@ int main(int argc, const char * argv[]) {
         } else if (strcmp(argv[index], "-I") == 0) {
             if (in_file != NULL) {
                 error = SE_FILE_ALREADY_OPEN_ERROR;
-                
+
             } else {
                 in_file = stdin;
             }
-            
+
             if (in_file == NULL) {
                 error = SE_INPUT_FILE_OPEN_ERROR;
             }
-            
+
+        //  -e  (echo)
+        } else if (strcmp(argv[index], "-e") == 0) {
+            echo = true;
+
         //  -o  output file for .wav
         } else if (strcmp(argv[index], "-o") == 0 && index + 1 < argc && out_file == NULL) {
             out_file = fopen(argv[++index], "w");

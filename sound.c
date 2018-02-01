@@ -184,8 +184,8 @@ SoundError fill_buffer(double freq, double msec)
             size_t samples = count <= available ? count : available;
 
 #if DEBUG
-            printf("fill buffer %d with %ld samples at %ld (%.1f)\n", current_buffer, (long)samples,
-                   (long)data_offset, freq);
+            printf("fill buffer %d with %ld samples at %ld (%.1f Hz %f msec)\n", current_buffer, (long)samples,
+                   (long)data_offset, freq, msec);
 #endif
 
             write_data(data + data_offset, freq, ramp, total, index, samples);
@@ -217,7 +217,7 @@ SoundError fill_buffer(double freq, double msec)
                     if (state != AL_PLAYING) {
                         // nothing is playing; either we haven't started yet, or we finished all
                         // queued buffers.
-                        
+
                         // make sure all except current buffer are unqueued
                         for (int k = 0; k < NUM_BUFFERS && error == SE_NO_ERROR; k++) {
                             if (k != current_buffer && buffer_queued[k]) {
@@ -306,12 +306,12 @@ SoundError finish_wave_file(FILE *file)
     // overwrite header area at beginning
     fseek(file, 0L, SEEK_SET);
     fwrite(&header, sizeof(header), 1, file);
-    
+
     // go back to end of file
     fseek(file, offset, SEEK_SET);
 
     // caller must close file!
-    
+
     return error;
 }
 

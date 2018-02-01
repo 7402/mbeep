@@ -199,7 +199,14 @@ void morse_help(void)
            "|  .-.-     <AA>\n"
            "%%  -.--.    <KN>\n"
            "\n"
-           "Note: * ^ # | %% are used by mbeep only - they are not\n"
+           "Control characters, represented by unused character assignments\n"
+           "<  begin sending with no letter gap\n"
+           ">  end sending with no letter gap\n"
+           "~  pause 1 second\n"
+           "`  pause amount of time equivalent to 1 dit\n"
+           "\\  send tone 1 dit in length, with no following gap\n"
+           "\n"
+           "Note: * ^ # | %% < > ~ ` \\ are used by mbeep only - they are not\n"
            "recognized elsewhere as Morse code.\n");
 }
 
