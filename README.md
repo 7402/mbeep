@@ -35,7 +35,7 @@ For more information, see man page.
 ```
 cd path_to_directory
 make
-make install
+sudo make install
 ```
 
 * CentOS 7
