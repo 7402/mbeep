@@ -76,7 +76,7 @@ The beep tool is good for reliable low-level output to the motherboard speaker o
 depend on a sound card or higher-level sound options or libraries. The mbeep tool is good for sending sound to
 headphones and speakers on Mac and Unix systems.
 
-See also ([Computer Tools for Morse Code Practice](https://7402.org/blog/2018/computer-tools-for-morse-code-practice.html)).
+See also [Computer Tools for Morse Code Practice](https://7402.org/blog/2018/computer-tools-for-morse-code-practice.html).
 
 ### License
 
