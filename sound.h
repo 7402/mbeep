@@ -60,8 +60,6 @@ SoundError init_sound(void);
 SoundError fill_buffer_or_file(double freq, double msec, FILE *file);
 SoundError fill_file(double freq, double msec, FILE *file);
 SoundError fill_buffer(double freq, double msec);
-void write_data(short *data_ptr, double freq, size_t ramp_count, size_t total_count,
-                size_t start_index, size_t sample_count);
 
 SoundError play_buffers(void);
 SoundError wait_for_buffers(void);

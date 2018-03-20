@@ -32,7 +32,7 @@
 
 void version(void)
 {
-    printf("mbeep 0.9.2\n");
+    printf("mbeep 0.9.3\n");
 }
 
 void usage(void)
@@ -421,6 +421,13 @@ void man_page_source(void)
            ".BR beep (1)\n"
            "\n"
            ".SH NOTES\n"
+#ifdef GPIO
+           "This version of mbeep was compiled for the Raspberry Pi via the build command \"make GPIO=%d\" "
+           "and generates tones by toggling the BCM%d GPIO pin to generate a square wave that can "
+           "be used as input to a pizeo speaker element.\n"
+           "\n"
+
+#else
            "The common beep tool on Unix systems does not work on the Mac, because the Mac does not have a simple piezo\n"
            "speaker on the motherboard. The mbeep tool uses the OpenAL framework, which is built into the macOS system;\n"
            "mbeep can also be used on Unix systems that have OpenAL installed.\n"
@@ -429,12 +436,17 @@ void man_page_source(void)
            "not depend on a sound card or higher\\-level sound options or libraries. The mbeep tool is good for sending sound to headphones\n"
            "and speakers on Mac and Unix systems.\n"
            "\n"
+#endif
            "The PARIS standard for words per minute speed assumes each word is the same length in Morse code as the word PARIS. This is the most common standard for code speed and is appropriate for plain\\-language text.\n"
            "\n"
            "The CODEX standard for words per minute speed assumes each word is the same length in Morse code as the word CODEX. This standard is appropriate for calculating speed for five\\-letter code groups.\n"
            "\n"
            ".SH AUTHOR\n"
            "Michael Budiansky \\fIhttps://www.7402.org/email\\fR\n"
-           "\n");
+           "\n"
+#ifdef GPIO
+           , GPIO, GPIO
+#endif
+           );
 }
 

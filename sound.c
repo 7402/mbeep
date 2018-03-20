@@ -35,8 +35,13 @@
     #include <OpenAL/al.h>
     #include <OpenAL/alc.h>
 #else
-    #include <AL/al.h>
-    #include <AL/alc.h>
+    #ifdef GPIO
+        #include <wiringPi.h>
+    #else
+        #include <AL/al.h>
+        #include <AL/alc.h>
+    #endif
+
     #define M_PI 3.14159265358979323846
 #endif
 
@@ -46,6 +51,12 @@
 #define BUFFER_SIZE (1 * SAMPLES_PER_SECOND)
 #define RAMP_MSEC 5.0
 
+#ifdef GPIO
+#define __USE_POSIX199309
+#define __USE_XOPEN2K
+#include <time.h>
+
+#else
 bool init_OK = false;
 ALCdevice *device = NULL;
 ALCcontext *context = NULL;
@@ -74,10 +85,20 @@ SoundError al_to_se_error(ALenum al_error)
         default:                    return(SE_UNKNOWN);
     }
 }
+#endif
+
+void write_data(short *data_ptr, double freq, size_t ramp_count, size_t total_count,
+                size_t start_index, size_t sample_count);
 
 SoundError init_sound(void)
 {
     SoundError error = SE_NO_ERROR;
+
+#ifdef GPIO
+    wiringPiSetupGpio();
+    pinMode(GPIO, OUTPUT);
+
+#else
     alGetError();
 
     for (int k = 0; k < NUM_BUFFERS; k++) {
@@ -113,6 +134,7 @@ SoundError init_sound(void)
         error = al_to_se_error(alGetError());
         source_OK = error == SE_NO_ERROR;
     }
+#endif
 
     return error;
 }
@@ -135,6 +157,40 @@ SoundError fill_buffer(double freq, double msec)
 {
     SoundError error = SE_NO_ERROR;
 
+#ifdef GPIO
+#define LONG_1E9 1000000000L
+    struct timespec ts;
+
+    if (freq == 0) {
+        ts.tv_sec = floor(0.001 * msec);
+        ts.tv_nsec = floor((msec - 1000 * ts.tv_sec) * 1000000.0);
+        nanosleep(&ts, NULL);
+
+    } else {
+        long nsec_per_half_cycle = (long)((1e9 / freq) / 2);
+        long cycles = (long)(freq * msec / 1000);
+
+        clock_gettime(CLOCK_MONOTONIC, &ts);
+
+        for (long k = 0; k < cycles; k++) {
+            digitalWrite(GPIO, 1);
+
+            ts.tv_nsec += nsec_per_half_cycle;
+            ts.tv_sec += ts.tv_nsec / LONG_1E9;
+            ts.tv_nsec = ts.tv_nsec % LONG_1E9;
+            clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &ts, NULL);
+
+            digitalWrite(GPIO, 0);
+
+            ts.tv_nsec += nsec_per_half_cycle;
+            ts.tv_sec += ts.tv_nsec / LONG_1E9;
+            ts.tv_nsec = ts.tv_nsec % LONG_1E9;
+            clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &ts, NULL);
+        }
+    }
+
+
+#else
     // total - total number of samples
     // count - samples remaining to be written
     // index - offset into sequence of samples
@@ -245,6 +301,7 @@ SoundError fill_buffer(double freq, double msec)
             }
         }
     }
+#endif
 
     return error;
 }
@@ -360,7 +417,7 @@ void write_data(short *data_ptr, double freq, size_t ramp_count, size_t total_co
                 size_t start_index, size_t sample_count)
 {
     if (freq == 0.0) {
-        memset(data_ptr, 0, sample_count * sizeof(ALshort));
+        memset(data_ptr, 0, sample_count * sizeof(short));
 
     } else {
         for (size_t k = start_index; k < start_index + sample_count; k++) {
@@ -373,7 +430,7 @@ void write_data(short *data_ptr, double freq, size_t ramp_count, size_t total_co
                 amplitude *= sin(0.5 * M_PI * (total_count - k) / ramp_count);
             }
 
-            *data_ptr++ = (ALshort)(amplitude);
+            *data_ptr++ = (short)(amplitude);
         }
     }
 }
@@ -383,6 +440,7 @@ SoundError play_buffers(void)
 {
     SoundError error = SE_NO_ERROR;
 
+#ifndef GPIO
     if (data_offset > 0) {
         // current buffer is partially filled
         alBufferData(buffers[current_buffer], AL_FORMAT_MONO16, data,
@@ -432,6 +490,7 @@ SoundError play_buffers(void)
         current_buffer = (current_buffer + 1) % NUM_BUFFERS;
         data_offset = 0;
     }
+#endif
 
     return error;
 }
@@ -441,6 +500,7 @@ SoundError wait_for_buffers(void)
 {
     SoundError error = SE_NO_ERROR;
 
+#ifndef GPIO
     bool done = false;
     while (!done && error == SE_NO_ERROR) {
         ALint value;
@@ -448,12 +508,14 @@ SoundError wait_for_buffers(void)
         error = al_to_se_error(alGetError());
         done = value != AL_PLAYING;
     }
+#endif
 
     return error;
 }
 
 void close_sound(void)
 {
+#ifndef GPIO
     if (data != NULL) {
         free(data);
         data = NULL;
@@ -481,4 +543,5 @@ void close_sound(void)
     }
 
     init_OK = false;
+#endif
 }

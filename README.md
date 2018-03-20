@@ -65,6 +65,16 @@ make
 sudo make install
 ```
 
+* Raspbian Stretch with GPIO patch
+
+```
+cd path_to_directory
+# assumes piezo speaker attached to GPIO pin BCM19
+make GPIO=19
+./mbeep --man-page > mbeep.1
+sudo make install
+```
+
 ### Notes
 
 The common Unix beep tool ([https://github.com/johnath/beep/](https://github.com/johnath/beep/)) does not work on
@@ -75,6 +85,10 @@ OpenAL installed.
 The beep tool is good for reliable low-level output to the motherboard speaker on Unix systems, and it does not
 depend on a sound card or higher-level sound options or libraries. The mbeep tool is good for sending sound to
 headphones and speakers on Mac and Unix systems.
+
+An experimental patch is available to send a square wave to a Raspberry Pi GPIO pin, which can be used with
+a piezo element to generate a tone when no other audio device is available. Sound quality is low. (When the patch
+is enabled, OpenAL is not used.)
 
 See also [Computer Tools for Morse Code Practice](https://7402.org/blog/2018/computer-tools-for-morse-code-practice.html).
 
