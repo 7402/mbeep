@@ -32,7 +32,7 @@
 
 void version(void)
 {
-    printf("mbeep 0.9.3\n");
+    printf("mbeep 0.9.4\n");
 }
 
 void usage(void)
@@ -63,6 +63,7 @@ void usage(void)
            "  -b <tempo>        Quarter notes per minute [default: 120]\n"
            "  -w <wpm>          Morse code speed in PARIS words per minute [default: 20]\n"
            "  --codex-wpm <wpm> Morse code speed in CODEX words per minute [default: 16 2/3]\n"
+           "  --fcc             Print effective FCC code test speed after sending.\n"
            "  -x <speed>        Character speed for Farnsworth Morse code timing\n"
            "  -i <input>        Input file or path for text used by -m or -c options\n"
            "  -I                Use stdin for text used by -m or -c options\n"
@@ -247,8 +248,8 @@ void man_page_source(void)
            "\\fIMSEC\\fR] [\\fB\\-r\\fR \\fIREPEATS\\fR] [\\fB\\-p\\fR] ]...\n"
            "\\fBmbeep\\fR [\\fB\\-o\\fR \\fIFILE\\fR] [\\fB\\-b\\fR \\fIBPM\\fR] \\fB\\-m\\fR \\fITEXT\\fR\n"
            "\\fBmbeep\\fR [\\fB\\-o\\fR \\fIFILE\\fR] [\\fB\\-b\\fR \\fIBPM\\fR] \\fB\\-i\\fR \\fIFILE\\fR \\fB\\-m\\fR\n"
-           "\\fBmbeep\\fR [\\fB\\-o\\fR \\fIFILE\\fR] [\\fB\\-w\\fR \\fIWPM\\fR] [\\fB\\-x\\fR \\fICHAR_SPEED\\fR] \\fB\\-c\\fR \\fITEXT\\fR\n"
-           "\\fBmbeep\\fR [\\fB\\-o\\fR \\fIFILE\\fR] [\\fB\\-w\\fR \\fIWPM\\fR] [\\fB\\-x\\fR \\fICHAR_SPEED\\fR] \\fB\\-i\\fR \\fIFILE\\fR \\fB\\-c\\fR\n"
+           "\\fBmbeep\\fR [\\fB\\-o\\fR \\fIFILE\\fR] [\\fB\\-w\\fR \\fIWPM\\fR] [\\fB\\-x\\fR \\fICHAR_SPEED\\fR] [\\fB\\-\\-fcc\\fR] \\fB\\-c\\fR \\fITEXT\\fR\n"
+           "\\fBmbeep\\fR [\\fB\\-o\\fR \\fIFILE\\fR] [\\fB\\-w\\fR \\fIWPM\\fR] [\\fB\\-x\\fR \\fICHAR_SPEED\\fR] [\\fB\\-\\-fcc\\fR] \\fB\\-i\\fR \\fIFILE\\fR \\fB\\-c\\fR\n"
            "\\fBmbeep\\fR \\fB\\-h\\fR | \\fB\\-v\\fR | \\fB\\-\\-midi\\-help\\fR | \\fB\\-\\-morse\\-help\\fR | \\\n"
            "\\fB\\-\\-license\\fR | \\fB\\-\\-man\\-page\\fR\n"
            ".fi\n"
@@ -322,6 +323,10 @@ void man_page_source(void)
            ".TP\n"
            ".BR \\-x \", \" \\-\\-farnsworth \" \" \\fICHAR_SPEED\\fR\n"
            "Character speed for Farnsworth Morse code timing. Default is same as words per minute.\n"
+           "\n"
+           ".TP\n"
+           ".BR \\-\\-fcc\n"
+           "Print effective FCC code test speed after sending.\n"
            "\n"
            ".TP\n"
            ".BR \\-i \" \" \\fIINPUT\\fR\n"
@@ -440,6 +445,8 @@ void man_page_source(void)
            "The PARIS standard for words per minute speed assumes each word is the same length in Morse code as the word PARIS. This is the most common standard for code speed and is appropriate for plain\\-language text.\n"
            "\n"
            "The CODEX standard for words per minute speed assumes each word is the same length in Morse code as the word CODEX. This standard is appropriate for calculating speed for five\\-letter code groups.\n"
+           "\n"
+           "The FCC code test standard for words per minute is to count the numbers of characters (with each number, punctuation mark or prosign counting as two characters), divide by five to obtain the number of words, and divide by time in minutes to get wpm.\n"
            "\n"
            ".SH AUTHOR\n"
            "Michael Budiansky \\fIhttps://www.7402.org/email\\fR\n"

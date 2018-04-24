@@ -29,6 +29,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define __USE_POSIX199309
+#define __USE_XOPEN2K
+#include <time.h>
+
 #include "patterns.h"
 #include "sound.h"
 #include "text.h"
@@ -51,6 +55,7 @@ int main(int argc, const char * argv[]) {
     double char_speed = DEFAULT;    // Farnsworth speed
     bool do_final_play = true;
     bool echo = false;
+    bool print_fcc_wpm = false;
 
     FILE *in_file = NULL;
     FILE *out_file = NULL;
@@ -102,6 +107,8 @@ int main(int argc, const char * argv[]) {
 
             if (error == SE_NO_ERROR) error = play_midi(bpm, gap, str, out_file);
 
+            if (error == SE_NO_ERROR) error = play_buffers();
+            if (error == SE_NO_ERROR) error = wait_for_buffers();
             do_final_play = false;
 
         //  -m  (send input file as midi notes)
@@ -152,6 +159,10 @@ int main(int argc, const char * argv[]) {
             char_speed = atof(argv[++index]);
             if (char_speed < 5.0 || char_speed > 60.0) error = SE_INVALID_WPM;
 
+        //  --fcc  print FCC wpm
+        } else if (strcmp(argv[index], "--fcc") == 0) {
+            print_fcc_wpm = true;
+
         //  -c  string to send as Morse code
         } else if (strcmp(argv[index], "-c") == 0 && index + 1 < argc) {
             if (needs_init) {
@@ -162,12 +173,29 @@ int main(int argc, const char * argv[]) {
             double farnsworth_ratio = char_speed == DEFAULT ? 1.0 : word_speed / char_speed;
             if (farnsworth_ratio > 1.0) error = SE_INVALID_WPM;
 
+            int fcc_char_count = 0;
+            struct timespec ts;
+            struct timespec te;
+
+            clock_gettime(CLOCK_MONOTONIC, &ts);
+
             if (error == SE_NO_ERROR) {
                 const char *text = argv[++index];
-                error = play_code(freq, dit, paris_standard, farnsworth_ratio, text, out_file);
+                error = play_code(freq, dit, paris_standard, farnsworth_ratio, &fcc_char_count, text, out_file);
             }
 
+            if (error == SE_NO_ERROR) error = play_buffers();
+            if (error == SE_NO_ERROR) error = wait_for_buffers();
+
             do_final_play = false;
+
+            clock_gettime(CLOCK_MONOTONIC, &te);
+            double elapsed = (double)(te.tv_sec - ts.tv_sec) + 1e-9 * (te.tv_nsec - ts.tv_nsec);
+
+            if (print_fcc_wpm) {
+                fprintf(stderr, "Elapsed %.1f seconds\nFCC char count %d\nFCC wpm %.1f\n", elapsed, fcc_char_count,
+                        (fcc_char_count / 5.0) / (elapsed / 60.0));
+            }
 
         //  -c  (send input file as Morse code)
         } else if (strcmp(argv[index], "-c") == 0 && in_file != NULL) {
@@ -179,8 +207,14 @@ int main(int argc, const char * argv[]) {
             double farnsworth_ratio = char_speed == DEFAULT ? 1.0 : word_speed / char_speed;
             if (farnsworth_ratio > 1.0) error = SE_INVALID_OPTION;
 
+            int fcc_char_count = 0;
+            struct timespec ts;
+            struct timespec te;
+
+            clock_gettime(CLOCK_MONOTONIC, &ts);
+
             while (error == SE_NO_ERROR && fgets(line, LINE_SIZE, in_file) != NULL) {
-                error = play_code(freq, dit, paris_standard, farnsworth_ratio, line, out_file);
+                error = play_code(freq, dit, paris_standard, farnsworth_ratio, &fcc_char_count, line, out_file);
 
                 if (error == SE_NO_ERROR) error = play_buffers();
                 if (error == SE_NO_ERROR) error = wait_for_buffers();
@@ -189,6 +223,14 @@ int main(int argc, const char * argv[]) {
                     printf("%s", line);
                     fflush(stdout);
                 }
+            }
+
+            clock_gettime(CLOCK_MONOTONIC, &te);
+            double elapsed = (double)(te.tv_sec - ts.tv_sec) + 1e-9 * (te.tv_nsec - ts.tv_nsec);
+
+            if (print_fcc_wpm) {
+                fprintf(stderr, "Elapsed %.1f seconds\nFCC char count %d\nFCC wpm %.1f\n", elapsed, fcc_char_count,
+                       (fcc_char_count / 5.0) / (elapsed / 60.0));
             }
 
             if (error == SE_NO_ERROR && ferror(in_file) != 0) {
@@ -285,10 +327,10 @@ int main(int argc, const char * argv[]) {
         }
 
         error = play(freq, msec, gap, repeats, out_file);
-    }
 
-    play_buffers();
-    wait_for_buffers();
+        if (error == SE_NO_ERROR) error = play_buffers();
+        if (error == SE_NO_ERROR) error = wait_for_buffers();
+    }
 
     if (in_file != NULL) {
         if (in_file != stdin) fclose(in_file);

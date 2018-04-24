@@ -36,6 +36,6 @@
 SoundError play(double freq, double msec, double gap, int repeats, FILE *out_file);
 SoundError play_midi(double bpm, double gap, const char *text, FILE *out_file);
 SoundError play_code(double freq, double dit, bool paris_standard, double farnsworth_ratio,
-                     const char *text, FILE *out_file);
+                     int *fcc_char_count, const char *text, FILE *out_file);
 
 #endif /* patterns_h */

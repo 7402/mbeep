@@ -9,8 +9,8 @@ mbeep \- send tone or sequence of tones to audio output or .wav file
 \fIMSEC\fR] [\fB\-r\fR \fIREPEATS\fR] [\fB\-p\fR] ]...
 \fBmbeep\fR [\fB\-o\fR \fIFILE\fR] [\fB\-b\fR \fIBPM\fR] \fB\-m\fR \fITEXT\fR
 \fBmbeep\fR [\fB\-o\fR \fIFILE\fR] [\fB\-b\fR \fIBPM\fR] \fB\-i\fR \fIFILE\fR \fB\-m\fR
-\fBmbeep\fR [\fB\-o\fR \fIFILE\fR] [\fB\-w\fR \fIWPM\fR] [\fB\-x\fR \fICHAR_SPEED\fR] \fB\-c\fR \fITEXT\fR
-\fBmbeep\fR [\fB\-o\fR \fIFILE\fR] [\fB\-w\fR \fIWPM\fR] [\fB\-x\fR \fICHAR_SPEED\fR] \fB\-i\fR \fIFILE\fR \fB\-c\fR
+\fBmbeep\fR [\fB\-o\fR \fIFILE\fR] [\fB\-w\fR \fIWPM\fR] [\fB\-x\fR \fICHAR_SPEED\fR] [\fB\-\-fcc\fR] \fB\-c\fR \fITEXT\fR
+\fBmbeep\fR [\fB\-o\fR \fIFILE\fR] [\fB\-w\fR \fIWPM\fR] [\fB\-x\fR \fICHAR_SPEED\fR] [\fB\-\-fcc\fR] \fB\-i\fR \fIFILE\fR \fB\-c\fR
 \fBmbeep\fR \fB\-h\fR | \fB\-v\fR | \fB\-\-midi\-help\fR | \fB\-\-morse\-help\fR | \
 \fB\-\-license\fR | \fB\-\-man\-page\fR
 .fi
@@ -84,6 +84,10 @@ Morse code speed in words per minute (CODEX standard). Default is 16 2/3.
 .TP
 .BR \-x ", " \-\-farnsworth " " \fICHAR_SPEED\fR
 Character speed for Farnsworth Morse code timing. Default is same as words per minute.
+
+.TP
+.BR \-\-fcc
+Print effective FCC code test speed after sending.
 
 .TP
 .BR \-i " " \fIINPUT\fR
@@ -194,6 +198,8 @@ and speakers on Mac and Unix systems.
 The PARIS standard for words per minute speed assumes each word is the same length in Morse code as the word PARIS. This is the most common standard for code speed and is appropriate for plain\-language text.
 
 The CODEX standard for words per minute speed assumes each word is the same length in Morse code as the word CODEX. This standard is appropriate for calculating speed for five\-letter code groups.
+
+The FCC code test standard for words per minute is to count the numbers of characters (with each number, punctuation mark or prosign counting as two characters), divide by five to obtain the number of words, and divide by time in minutes to get wpm.
 
 .SH AUTHOR
 Michael Budiansky \fIhttps://www.7402.org/email\fR

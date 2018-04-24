@@ -200,7 +200,7 @@ SoundError play_midi(double bpm, double gap, const char *text, FILE *out_file)
 }
 
 SoundError play_code(double freq, double dit, bool paris_standard, double farnsworth_ratio,
-                     const char *text, FILE *out_file)
+                     int *fcc_char_count, const char *text, FILE *out_file)
 {
     bool was_space = false;
     bool is_space = false;
@@ -345,6 +345,15 @@ SoundError play_code(double freq, double dit, bool paris_standard, double farnsw
                 break;
 
             default:    is_space = true;            break;
+        }
+
+        if (fcc_char_count != NULL) {
+            if (c >= 'A' && c <= 'Z') {
+                (*fcc_char_count)++;
+
+            } else if (!is_space && c != '`' && c != '\\' && c != '~') {
+                (*fcc_char_count) += 2;
+            }
         }
 
         for (int i = 0; i < strlen(sequence); i++) {
