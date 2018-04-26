@@ -110,7 +110,7 @@ SoundError init_sound(void)
 
     if (error == SE_NO_ERROR) {
         context = alcCreateContext(device, NULL);
-        if (device == NULL) error = SE_NO_CONTEXT;
+        if (context == NULL) error = SE_NO_CONTEXT;
     }
 
     if (error == SE_NO_ERROR) {
