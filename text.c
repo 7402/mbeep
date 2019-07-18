@@ -32,7 +32,7 @@
 
 void version(void)
 {
-    printf("mbeep 0.9.4\n");
+    printf("mbeep 0.9.5\n");
 }
 
 void usage(void)

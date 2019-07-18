@@ -40,6 +40,13 @@
 #define LINE_SIZE 1024
 #define DEFAULT_WPM 20.0
 
+// only available for macOS >= 10.12
+#define USE_CLOCK_MONOTONIC 0
+
+#if !USE_CLOCK_MONOTONIC
+#include <sys/time.h>
+#endif
+
 int main(int argc, const char * argv[]) {
     SoundError error = SE_NO_ERROR;
 
@@ -174,10 +181,18 @@ int main(int argc, const char * argv[]) {
             if (farnsworth_ratio > 1.0) error = SE_INVALID_WPM;
 
             int fcc_char_count = 0;
+
+#if USE_CLOCK_MONOTONIC
             struct timespec ts;
             struct timespec te;
 
             clock_gettime(CLOCK_MONOTONIC, &ts);
+
+#else
+            struct timeval ts;
+            struct timeval te;
+            gettimeofday(&ts, NULL);
+#endif
 
             if (error == SE_NO_ERROR) {
                 const char *text = argv[++index];
@@ -189,8 +204,14 @@ int main(int argc, const char * argv[]) {
 
             do_final_play = false;
 
+#if USE_CLOCK_MONOTONIC
             clock_gettime(CLOCK_MONOTONIC, &te);
             double elapsed = (double)(te.tv_sec - ts.tv_sec) + 1e-9 * (te.tv_nsec - ts.tv_nsec);
+
+#else
+            gettimeofday(&te, NULL);
+            double elapsed = (double)(te.tv_sec - ts.tv_sec) + 1e-6 * (te.tv_usec - ts.tv_usec);
+#endif
 
             if (print_fcc_wpm) {
                 fprintf(stderr, "Elapsed %.1f seconds\nFCC char count %d\nFCC wpm %.1f\n", elapsed, fcc_char_count,
@@ -208,10 +229,18 @@ int main(int argc, const char * argv[]) {
             if (farnsworth_ratio > 1.0) error = SE_INVALID_OPTION;
 
             int fcc_char_count = 0;
+
+#if USE_CLOCK_MONOTONIC
             struct timespec ts;
             struct timespec te;
 
             clock_gettime(CLOCK_MONOTONIC, &ts);
+
+#else
+            struct timeval ts;
+            struct timeval te;
+            gettimeofday(&ts, NULL);
+#endif
 
             while (error == SE_NO_ERROR && fgets(line, LINE_SIZE, in_file) != NULL) {
                 error = play_code(freq, dit, paris_standard, farnsworth_ratio, &fcc_char_count, line, out_file);
@@ -225,8 +254,14 @@ int main(int argc, const char * argv[]) {
                 }
             }
 
+#if USE_CLOCK_MONOTONIC
             clock_gettime(CLOCK_MONOTONIC, &te);
             double elapsed = (double)(te.tv_sec - ts.tv_sec) + 1e-9 * (te.tv_nsec - ts.tv_nsec);
+
+#else
+            gettimeofday(&te, NULL);
+            double elapsed = (double)(te.tv_sec - ts.tv_sec) + 1e-6 * (te.tv_usec - ts.tv_usec);
+#endif
 
             if (print_fcc_wpm) {
                 fprintf(stderr, "Elapsed %.1f seconds\nFCC char count %d\nFCC wpm %.1f\n", elapsed, fcc_char_count,
