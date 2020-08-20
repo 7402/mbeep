@@ -59,6 +59,8 @@ int main(int argc, const char * argv[]) {
     bool paris_standard = true;
     double dit = 1200.0 / DEFAULT_WPM;  // 20 wpm PARIS standard
     double word_speed = DEFAULT_WPM;
+    double word_space_speed = DEFAULT_WPM;
+    bool using_word_space_speed = false;
     double char_speed = DEFAULT;    // Farnsworth speed
     bool do_final_play = true;
     bool echo = false;
@@ -149,6 +151,7 @@ int main(int argc, const char * argv[]) {
         } else if (((strcmp(argv[index], "--paris-wpm") == 0) ||
                     (strcmp(argv[index], "-w") == 0)) && index + 1 < argc) {
             word_speed = atof(argv[++index]);
+            if (!using_word_space_speed) word_space_speed = word_speed;
             paris_standard = true;
             dit = 60.0 * 1000.0 / (50.0 * word_speed);
             if (word_speed < 5.0 || word_speed > 60.0) error = SE_INVALID_WPM;
@@ -156,6 +159,7 @@ int main(int argc, const char * argv[]) {
         //  --codex-wpm  words per minute, CODEX standard
         } else if (strcmp(argv[index], "--codex-wpm") == 0 && index + 1 < argc) {
             word_speed = atof(argv[++index]);
+            if (!using_word_space_speed) word_space_speed = word_speed;
             paris_standard = false;
             dit = 60.0 * 1000.0 / (60.0 * word_speed);
             if (word_speed < 5.0 || word_speed > 60.0) error = SE_INVALID_WPM;
@@ -165,6 +169,12 @@ int main(int argc, const char * argv[]) {
                     (strcmp(argv[index], "-x") == 0)) && index + 1 < argc) {
             char_speed = atof(argv[++index]);
             if (char_speed < 5.0 || char_speed > 60.0) error = SE_INVALID_WPM;
+
+        //  --wss  --word-space-speed word-space speed
+        } else if ((strcmp(argv[index], "--wss") == 0) && index + 1 < argc) {
+            word_space_speed = atof(argv[++index]);
+            using_word_space_speed = true;
+            if (word_space_speed < 5.0 || word_space_speed > 60.0) error = SE_INVALID_WPM;
 
         //  --fcc  print FCC wpm
         } else if (strcmp(argv[index], "--fcc") == 0) {
@@ -179,6 +189,12 @@ int main(int argc, const char * argv[]) {
 
             double farnsworth_ratio = char_speed == DEFAULT ? 1.0 : word_speed / char_speed;
             if (farnsworth_ratio > 1.0) error = SE_INVALID_WPM;
+
+            double extra_word_gap = 0.0;
+            if (word_space_speed < word_speed) {
+                extra_word_gap = ((paris_standard ? 50.0 : 60.0) + 7.0) *
+                dit * (word_speed / word_space_speed - 1.0);
+            }
 
             int fcc_char_count = 0;
 
@@ -196,7 +212,8 @@ int main(int argc, const char * argv[]) {
 
             if (error == SE_NO_ERROR) {
                 const char *text = argv[++index];
-                error = play_code(freq, dit, paris_standard, farnsworth_ratio, &fcc_char_count, text, out_file);
+                error = play_code(freq, dit, paris_standard, farnsworth_ratio,
+                                  extra_word_gap, &fcc_char_count, text, out_file);
             }
 
             if (error == SE_NO_ERROR) error = play_buffers();
@@ -228,6 +245,12 @@ int main(int argc, const char * argv[]) {
             double farnsworth_ratio = char_speed == DEFAULT ? 1.0 : word_speed / char_speed;
             if (farnsworth_ratio > 1.0) error = SE_INVALID_OPTION;
 
+            double extra_word_gap = 0.0;
+            if (word_space_speed < word_speed) {
+                extra_word_gap = ((paris_standard ? 50.0 : 60.0) + 7.0) *
+                    dit * (word_speed / word_space_speed - 1.0);
+            }
+
             int fcc_char_count = 0;
 
 #if USE_CLOCK_MONOTONIC
@@ -243,7 +266,8 @@ int main(int argc, const char * argv[]) {
 #endif
 
             while (error == SE_NO_ERROR && fgets(line, LINE_SIZE, in_file) != NULL) {
-                error = play_code(freq, dit, paris_standard, farnsworth_ratio, &fcc_char_count, line, out_file);
+                error = play_code(freq, dit, paris_standard, farnsworth_ratio,
+                                  extra_word_gap, &fcc_char_count, line, out_file);
 
                 if (error == SE_NO_ERROR) error = play_buffers();
                 if (error == SE_NO_ERROR) error = wait_for_buffers();

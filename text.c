@@ -32,7 +32,7 @@
 
 void version(void)
 {
-    printf("mbeep 0.9.5\n");
+    printf("mbeep 0.9.6\n");
 }
 
 void usage(void)
@@ -65,6 +65,7 @@ void usage(void)
            "  --codex-wpm <wpm> Morse code speed in CODEX words per minute [default: 16 2/3]\n"
            "  --fcc             Print effective FCC code test speed after sending.\n"
            "  -x <speed>        Character speed for Farnsworth Morse code timing\n"
+           "  --wss <speed>     Word space speed for extra gap between words\n"
            "  -i <input>        Input file or path for text used by -m or -c options\n"
            "  -I                Use stdin for text used by -m or -c options\n"
            "  -m <string>       Send sequence of MIDI notes specified by string\n"

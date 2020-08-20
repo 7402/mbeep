@@ -200,6 +200,7 @@ SoundError play_midi(double bpm, double gap, const char *text, FILE *out_file)
 }
 
 SoundError play_code(double freq, double dit, bool paris_standard, double farnsworth_ratio,
+                     double extra_word_gap,
                      int *fcc_char_count, const char *text, FILE *out_file)
 {
     bool was_space = false;
@@ -375,7 +376,7 @@ SoundError play_code(double freq, double dit, bool paris_standard, double farnsw
         }
 
         if (is_space && !was_space) {
-            fill_buffer_or_file(SILENCE, 4 * gap_dit, out_file);
+            fill_buffer_or_file(SILENCE, 4 * gap_dit + extra_word_gap, out_file);
         }
 
         was_space = is_space;
