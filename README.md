@@ -35,6 +35,7 @@ For more information, see man page.
 ```
 cd path_to_directory
 make
+./mbeep --man-page > mbeep.1
 sudo make install
 ```
 
@@ -44,6 +45,7 @@ sudo make install
 sudo yum install openal-soft-devel
 cd path_to_directory
 make
+./mbeep --man-page > mbeep.1
 sudo make install
 ```
 
@@ -53,6 +55,7 @@ sudo make install
 sudo apt-get install libopenal-dev
 cd path_to_directory
 make
+./mbeep --man-page > mbeep.1
 sudo make install
 ```
 
@@ -62,6 +65,7 @@ sudo make install
 sudo apt-get install libopenal-dev
 cd path_to_directory
 make
+./mbeep --man-page > mbeep.1
 sudo make install
 ```
 

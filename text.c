@@ -32,7 +32,7 @@
 
 void version(void)
 {
-    printf("mbeep 0.9.6\n");
+    printf("mbeep 0.9.6.1\n");
 }
 
 void usage(void)
@@ -65,7 +65,7 @@ void usage(void)
            "  --codex-wpm <wpm> Morse code speed in CODEX words per minute [default: 16 2/3]\n"
            "  --fcc             Print effective FCC code test speed after sending.\n"
            "  -x <speed>        Character speed for Farnsworth Morse code timing\n"
-           "  --wss <speed>     Word space speed for extra gap between words\n"
+           "  --wss <speed>     Word speed with extra space between words\n"
            "  -i <input>        Input file or path for text used by -m or -c options\n"
            "  -I                Use stdin for text used by -m or -c options\n"
            "  -m <string>       Send sequence of MIDI notes specified by string\n"
@@ -250,7 +250,7 @@ void man_page_source(void)
            "\\fBmbeep\\fR [\\fB\\-o\\fR \\fIFILE\\fR] [\\fB\\-b\\fR \\fIBPM\\fR] \\fB\\-m\\fR \\fITEXT\\fR\n"
            "\\fBmbeep\\fR [\\fB\\-o\\fR \\fIFILE\\fR] [\\fB\\-b\\fR \\fIBPM\\fR] \\fB\\-i\\fR \\fIFILE\\fR \\fB\\-m\\fR\n"
            "\\fBmbeep\\fR [\\fB\\-o\\fR \\fIFILE\\fR] [\\fB\\-w\\fR \\fIWPM\\fR] [\\fB\\-x\\fR \\fICHAR_SPEED\\fR] [\\fB\\-\\-fcc\\fR] \\fB\\-c\\fR \\fITEXT\\fR\n"
-           "\\fBmbeep\\fR [\\fB\\-o\\fR \\fIFILE\\fR] [\\fB\\-w\\fR \\fIWPM\\fR] [\\fB\\-x\\fR \\fICHAR_SPEED\\fR] [\\fB\\-\\-fcc\\fR] \\fB\\-i\\fR \\fIFILE\\fR \\fB\\-c\\fR\n"
+           "\\fBmbeep\\fR [\\fB\\-o\\fR \\fIFILE\\fR] [\\fB\\-w\\fR \\fIWPM\\fR] [\\fB\\-x\\fR \\fICHAR_SPEED\\fR] [\\fB\\-\\-wss\\fR \\fIWORD_SPEED\\fR] [\\fB\\-\\-fcc\\fR] \\fB\\-i\\fR \\fIFILE\\fR \\fB\\-c\\fR\n"
            "\\fBmbeep\\fR \\fB\\-h\\fR | \\fB\\-v\\fR | \\fB\\-\\-midi\\-help\\fR | \\fB\\-\\-morse\\-help\\fR | \\\n"
            "\\fB\\-\\-license\\fR | \\fB\\-\\-man\\-page\\fR\n"
            ".fi\n"
@@ -324,6 +324,10 @@ void man_page_source(void)
            ".TP\n"
            ".BR \\-x \", \" \\-\\-farnsworth \" \" \\fICHAR_SPEED\\fR\n"
            "Character speed for Farnsworth Morse code timing. Default is same as words per minute.\n"
+           "\n"
+           ".TP\n"
+           ".BR \\-\\-wss \" \" \\fIWORD_SPEED\\fR\n"
+           "Word speed with extra space between words. Default is same as words per minute.\n"
            "\n"
            ".TP\n"
            ".BR \\-\\-fcc\n"
