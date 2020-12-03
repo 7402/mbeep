@@ -49,7 +49,7 @@
 
 #define SAMPLES_PER_SECOND 44100
 #define BUFFER_SIZE (1 * SAMPLES_PER_SECOND)
-#define RAMP_MSEC 5.0
+#define RAMP_MSEC 20.0
 
 #ifdef GPIO
 #define __USE_POSIX199309
@@ -199,9 +199,9 @@ SoundError fill_buffer(double freq, double msec)
     size_t index = 0;
 
     // To prevent clicks at beginning and end of tone, ramp amplitude up at beginning and down
-    // at end by multiplying by sine / cosine function. Use RAMP_MSEC or 10% of duration,
+    // at end by multiplying by sine / cosine function. Use RAMP_MSEC or 30% of duration,
     // whichever is smaller.
-    double max_ramp_msec = msec / 10.0;
+    double max_ramp_msec = msec * 0.30;
     double ramp_msec = RAMP_MSEC < max_ramp_msec ? RAMP_MSEC : max_ramp_msec;
     size_t ramp = (size_t)(0.001 * ramp_msec * SAMPLES_PER_SECOND);
 
@@ -385,7 +385,7 @@ SoundError fill_file(double freq, double msec, FILE *file)
 
     size_t total = (size_t)(0.001 * msec * SAMPLES_PER_SECOND);
     size_t remaining = total;
-    double max_ramp_msec = msec / 10.0;
+    double max_ramp_msec = msec * 0.30;
     double ramp_msec = RAMP_MSEC < max_ramp_msec ? RAMP_MSEC : max_ramp_msec;
     size_t ramp = (size_t)(0.001 * ramp_msec * SAMPLES_PER_SECOND);
     size_t index = 0;

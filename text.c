@@ -32,7 +32,7 @@
 
 void version(void)
 {
-    printf("mbeep 0.9.6.1\n");
+    printf("mbeep 0.9.6.2\n");
 }
 
 void usage(void)
@@ -249,7 +249,7 @@ void man_page_source(void)
            "\\fIMSEC\\fR] [\\fB\\-r\\fR \\fIREPEATS\\fR] [\\fB\\-p\\fR] ]...\n"
            "\\fBmbeep\\fR [\\fB\\-o\\fR \\fIFILE\\fR] [\\fB\\-b\\fR \\fIBPM\\fR] \\fB\\-m\\fR \\fITEXT\\fR\n"
            "\\fBmbeep\\fR [\\fB\\-o\\fR \\fIFILE\\fR] [\\fB\\-b\\fR \\fIBPM\\fR] \\fB\\-i\\fR \\fIFILE\\fR \\fB\\-m\\fR\n"
-           "\\fBmbeep\\fR [\\fB\\-o\\fR \\fIFILE\\fR] [\\fB\\-w\\fR \\fIWPM\\fR] [\\fB\\-x\\fR \\fICHAR_SPEED\\fR] [\\fB\\-\\-fcc\\fR] \\fB\\-c\\fR \\fITEXT\\fR\n"
+           "\\fBmbeep\\fR [\\fB\\-o\\fR \\fIFILE\\fR] [\\fB\\-w\\fR \\fIWPM\\fR] [\\fB\\-x\\fR \\fICHAR_SPEED\\fR] [\\fB\\-\\-wss\\fR \\fIWORD_SPEED\\fR] [\\fB\\-\\-fcc\\fR] \\fB\\-c\\fR \\fITEXT\\fR\n"
            "\\fBmbeep\\fR [\\fB\\-o\\fR \\fIFILE\\fR] [\\fB\\-w\\fR \\fIWPM\\fR] [\\fB\\-x\\fR \\fICHAR_SPEED\\fR] [\\fB\\-\\-wss\\fR \\fIWORD_SPEED\\fR] [\\fB\\-\\-fcc\\fR] \\fB\\-i\\fR \\fIFILE\\fR \\fB\\-c\\fR\n"
            "\\fBmbeep\\fR \\fB\\-h\\fR | \\fB\\-v\\fR | \\fB\\-\\-midi\\-help\\fR | \\fB\\-\\-morse\\-help\\fR | \\\n"
            "\\fB\\-\\-license\\fR | \\fB\\-\\-man\\-page\\fR\n"
