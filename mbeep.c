@@ -2,7 +2,7 @@
 // mbeep.c
 // mbeep
 //
-// Copyright (C) 2018 Michael Budiansky. All rights reserved.
+// Copyright (C) 2018-2021 Michael Budiansky. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are permitted
 // provided that the following conditions are met:
@@ -330,8 +330,10 @@ int main(int argc, const char * argv[]) {
         } else if (strcmp(argv[index], "-e") == 0) {
             echo = true;
 
-        //  -o  output file for .wav
-        } else if (strcmp(argv[index], "-o") == 0 && index + 1 < argc && out_file == NULL) {
+        //  -o --wav  output file for .wav
+        } else if (((strcmp(argv[index], "-o") == 0) ||
+                    (strcmp(argv[index], "--wav") == 0)) && index + 1 < argc && out_file == NULL) {
+            
             out_file = fopen(argv[++index], "w");
 
             if (out_file == NULL) {

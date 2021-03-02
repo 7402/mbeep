@@ -2,7 +2,7 @@
 // text.c
 // mbeep
 //
-// Copyright (C) 2018 Michael Budiansky. All rights reserved.
+// Copyright (C) 2018-2021 Michael Budiansky. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are permitted
 // provided that the following conditions are met:
@@ -32,7 +32,7 @@
 
 void version(void)
 {
-    printf("mbeep 0.9.6.2\n");
+    printf("mbeep 0.9.7\n");
 }
 
 void usage(void)
@@ -60,6 +60,7 @@ void usage(void)
            "  -r <repeats>      Number of times to repeat tone [default: 1]\n"
            "  -p                Play tone. Used when specifying sequence of multiple tones.\n"
            "  -o <output>       Write .wav file containing tones\n"
+           "  --wav <output>    Write .wav file containing tones\n"
            "  -b <tempo>        Quarter notes per minute [default: 120]\n"
            "  -w <wpm>          Morse code speed in PARIS words per minute [default: 20]\n"
            "  --codex-wpm <wpm> Morse code speed in CODEX words per minute [default: 16 2/3]\n"
