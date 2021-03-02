@@ -215,7 +215,7 @@ void morse_help(void)
 
 void license(void)
 {
-    printf("Copyright (C) 2018 Michael Budiansky. All rights reserved.\n"
+    printf("Copyright (C) 2018-2021 Michael Budiansky. All rights reserved.\n"
            "\n"
            "Redistribution and use in source and binary forms, with or without modification, are permitted\n"
            "provided that the following conditions are met:\n"
@@ -308,6 +308,10 @@ void man_page_source(void)
            "\n"
            ".TP\n"
            ".BR \\-o \" \" \\fIOUTPUT\\fR\n"
+           "Write .wav file containing tones.\n"
+           "\n"
+           ".TP\n"
+           ".BR \\--wav \" \" \\fIOUTPUT\\fR\n"
            "Write .wav file containing tones.\n"
            "\n"
            ".TP\n"
