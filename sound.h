@@ -2,7 +2,7 @@
 // sound.h
 // mbeep
 //
-// Copyright (C) 2018 Michael Budiansky. All rights reserved.
+// Copyright (C) 2018-21 Michael Budiansky. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are permitted
 // provided that the following conditions are met:
@@ -26,6 +26,10 @@
 
 #ifndef sound_h
 #define sound_h
+
+#include <stdio.h>
+#include <stdint.h>
+#include <stdbool.h>
 
 #define SILENCE 0.0
 
@@ -53,8 +57,26 @@ typedef enum SoundError {
     SE_INPUT_FILE_OPEN_ERROR,
     SE_OUTPUT_FILE_OPEN_ERROR,
     SE_FILE_ALREADY_OPEN_ERROR,
-    SE_FILE_WRITE_ERROR
+    SE_FILE_WRITE_ERROR,
+    SE_INVALID_FILE_FORMAT
 } SoundError;
+
+struct WaveHeader {
+    char label[4];
+    uint32_t file_size_minus_8;
+    char file_type[4];
+    char marker[4];
+    uint32_t length_so_far;
+    uint16_t format_type;
+    uint16_t channels;
+    uint32_t samples_per_second;
+    uint32_t bytes_per_second;
+    uint16_t bytes_per_sample;
+    uint16_t bits_per_sample_per_channel;
+    char data_header[4];
+    uint32_t data_size;
+};
+typedef struct WaveHeader WaveHeader;
 
 SoundError init_sound(void);
 SoundError fill_buffer_or_file(double freq, double msec, FILE *file);
@@ -62,11 +84,20 @@ SoundError fill_file(double freq, double msec, FILE *file);
 SoundError fill_buffer(double freq, double msec);
 
 SoundError play_buffers(void);
+bool sound_playing(void);
 SoundError wait_for_buffers(void);
 void close_sound(void);
 
+bool sound_playing(void);
+
 SoundError begin_wave_file(FILE *file);
 SoundError finish_wave_file(FILE *file);
+
+SoundError play_wav(const char *path);
+SoundError read_wav(const char *path, WaveHeader *header, int16_t **file_data, long *file_size);
+SoundError play_wav_data(WaveHeader *header, int16_t *file_data, long file_size);
+
+const char *sound_error_text(SoundError error);
 
 #endif /* sound_hpp */
 

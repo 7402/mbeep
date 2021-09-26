@@ -313,6 +313,20 @@ int main(int argc, const char * argv[]) {
                 error = SE_INPUT_FILE_OPEN_ERROR;
             }
 
+        //  --play  play .wav file (for testing files written by mbeep)
+        } else if (strcmp(argv[index], "--play") == 0 && index + 1 < argc) {
+            if (needs_init) {
+                error = init_sound();
+                needs_init = false;
+            }
+
+            if (error == SE_NO_ERROR) {
+                do_final_play = false;
+                error = play_wav(argv[++index]);
+            }
+            
+            if (error == SE_NO_ERROR) error = wait_for_buffers();
+
         //  -I  use stdin for midi or code string (same as -i /dev/stdin)
         } else if (strcmp(argv[index], "-I") == 0) {
             if (in_file != NULL) {

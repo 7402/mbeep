@@ -2,7 +2,7 @@
 // sound.c
 // mbeep
 //
-// Copyright (C) 2018 Michael Budiansky. All rights reserved.
+// Copyright (C) 2018-21 Michael Budiansky. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are permitted
 // provided that the following conditions are met:
@@ -26,7 +26,6 @@
 
 #include <math.h>
 #include <stdbool.h>
-#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -99,7 +98,6 @@ SoundError init_sound(void)
     pinMode(GPIO, OUTPUT);
 
 #else
-    alGetError();
 
     for (int k = 0; k < NUM_BUFFERS; k++) {
         buffer_queued[k] = false;
@@ -119,6 +117,7 @@ SoundError init_sound(void)
     }
 
     if (error == SE_NO_ERROR) {
+        alGetError();
         alGenBuffers(NUM_BUFFERS, buffers);
         error = al_to_se_error(alGetError());
         buffers_OK = error == SE_NO_ERROR;
@@ -220,14 +219,14 @@ SoundError fill_buffer(double freq, double msec)
                 alSourceUnqueueBuffers(source, 1, &buffers[current_buffer]);
                 error = al_to_se_error(alGetError());
 #if DEBUG
-                printf("[%d] unqueue %d\n", processed, current_buffer);
+                fprintf(stderr, "[%d] unqueue %d\n", processed, current_buffer);
 #endif
             }
 
             if (error == SE_NO_ERROR) {
                 alGetSourcei(source, AL_BUFFERS_PROCESSED, &processed);
 #if DEBUG
-                printf("[%d]\n", processed);
+                fprintf(stderr, "[%d]\n", processed);
 #endif
                 buffer_queued[current_buffer] = false;
             }
@@ -240,7 +239,7 @@ SoundError fill_buffer(double freq, double msec)
             size_t samples = count <= available ? count : available;
 
 #if DEBUG
-            printf("fill buffer %d with %ld samples at %ld (%.1f Hz %f msec)\n", current_buffer, (long)samples,
+            fprintf(stderr, "fill buffer %d with %ld samples at %ld (%.1f Hz %f msec)\n", current_buffer, (long)samples,
                    (long)data_offset, freq, msec);
 #endif
 
@@ -257,7 +256,7 @@ SoundError fill_buffer(double freq, double msec)
 
                 error = al_to_se_error(alGetError());
 #if DEBUG
-                printf("queue %d\n", current_buffer);
+                fprintf(stderr, "queue %d\n", current_buffer);
 #endif
 
                 if (error == SE_NO_ERROR) {
@@ -280,7 +279,7 @@ SoundError fill_buffer(double freq, double msec)
                                 alSourceUnqueueBuffers(source, 1, &buffers[k]);
                                 error = al_to_se_error(alGetError());
 #if DEBUG
-                                printf("unqueue non-playing %d\n", k);
+                                fprintf(stderr, "unqueue non-playing %d\n", k);
 #endif
                                 buffer_queued[k] = false;
                             }
@@ -289,7 +288,7 @@ SoundError fill_buffer(double freq, double msec)
                         if (error == SE_NO_ERROR) {
                             alSourcePlay(source);
 #if DEBUG
-                            printf("play\n");
+                            fprintf(stderr, "play\n");
 #endif
                             error = al_to_se_error(alGetError());
                         }
@@ -327,29 +326,14 @@ SoundError begin_wave_file(FILE *file)
 SoundError finish_wave_file(FILE *file)
 {
     SoundError error = SE_NO_ERROR;
-
-    struct {
-        char label[4];
-        uint32_t file_size_minus_8;
-        char file_type[4];
-        char marker[4];
-        uint32_t length_so_far;
-        uint16_t format_type;
-        uint16_t channels;
-        uint32_t samples_per_second;
-        uint32_t bytes_per_second;
-        uint16_t bytes_per_sample;
-        uint16_t bits_per_sample_per_channel;
-        char data_header[4];
-        uint32_t data_size;
-    } header;
+    WaveHeader header;
 
     long offset = ftell(file);
 
-    strncpy(header.label, "RIFF", 4);
+    memcpy(header.label, "RIFF", 4);
     header.file_size_minus_8 = (uint32_t)offset - 8;
-    strncpy(header.file_type, "WAVE", 4);
-    strncpy(header.marker, "fmt ", 4);
+    memcpy(header.file_type, "WAVE", 4);
+    memcpy(header.marker, "fmt ", 4);
     header.length_so_far = 16;
     header.format_type = 1;
     header.channels = CHANNELS;
@@ -357,7 +341,7 @@ SoundError finish_wave_file(FILE *file)
     header.bytes_per_second = (SAMPLES_PER_SECOND * BITS_PER_SAMPLE * CHANNELS) / 8;
     header.bytes_per_sample = (BITS_PER_SAMPLE * CHANNELS) / 8;
     header.bits_per_sample_per_channel = 16;
-    strncpy(header.data_header, "data", 4);
+    memcpy(header.data_header, "data", 4);
     header.data_size = (uint32_t)offset - WAVE_HEADER_SIZE;
 
     // overwrite header area at beginning
@@ -378,7 +362,7 @@ SoundError finish_wave_file(FILE *file)
 SoundError fill_file(double freq, double msec, FILE *file)
 {
 #if DEBUG
-    printf("fill_file(%f, %f)\n", freq, msec);
+    fprintf(stderr, "fill_file(%f, %f)\n", freq, msec);
 #endif
 
     SoundError error = SE_NO_ERROR;
@@ -393,7 +377,7 @@ SoundError fill_file(double freq, double msec, FILE *file)
     int16_t buffer[BUF_SIZE];
 
 #if DEBUG
-    printf("  total = %ld\n", total);
+    fprintf(stderr, "  total = %ld\n", (long)total);
 #endif
 
     while (remaining > 0 && error == SE_NO_ERROR) {
@@ -402,7 +386,7 @@ SoundError fill_file(double freq, double msec, FILE *file)
         write_data(buffer, freq, ramp, total, index, count);
         fwrite(buffer, sizeof(int16_t), count, file);
 #if DEBUG
-        printf("  fwrite %ld\n", count);
+        fprintf(stderr, "  fwrite %ld\n", (long)count);
 #endif
 
         index += count;
@@ -455,7 +439,7 @@ SoundError play_buffers(void)
         }
 
 #if DEBUG
-        printf("play_buffers queue %d\n", current_buffer);
+        fprintf(stderr, "play_buffers queue %d\n", current_buffer);
 #endif
 
         if (error == SE_NO_ERROR) {
@@ -471,7 +455,7 @@ SoundError play_buffers(void)
                         alSourceUnqueueBuffers(source, 1, &buffers[k]);
                         error = al_to_se_error(alGetError());
 #if DEBUG
-                        printf("play_buffers unqueue non-playing %d\n", k);
+                        fprintf(stderr, "play_buffers unqueue non-playing %d\n", k);
 #endif
                         buffer_queued[k] = false;
                     }
@@ -481,7 +465,7 @@ SoundError play_buffers(void)
                     alSourcePlay(source);
                     error = al_to_se_error(alGetError());
 #if DEBUG
-                    printf("play_buffers play\n");
+                    fprintf(stderr, "play_buffers play\n");
 #endif
                 }
             }
@@ -495,11 +479,27 @@ SoundError play_buffers(void)
     return error;
 }
 
+bool sound_playing(void)
+{
+    ALint value;
+    
+    alGetSourcei(source, AL_SOURCE_STATE, &value);
+    SoundError error = al_to_se_error(alGetError());
+    
+    bool playing = error == SE_NO_ERROR && value == AL_PLAYING;
+
+    return playing;
+}
+
 // if any buffers are playing, wait until playing stops
 SoundError wait_for_buffers(void)
 {
     SoundError error = SE_NO_ERROR;
 
+#if DEBUG
+    fprintf(stderr, "wait_for_buffers()\n");
+#endif
+    
 #ifndef GPIO
     bool done = false;
     while (!done && error == SE_NO_ERROR) {
@@ -508,6 +508,22 @@ SoundError wait_for_buffers(void)
         error = al_to_se_error(alGetError());
         done = value != AL_PLAYING;
     }
+    
+    for (int k = 0; k < NUM_BUFFERS && error == SE_NO_ERROR; k++) {
+        if (buffer_queued[k]) {
+            alSourceUnqueueBuffers(source, 1, &buffers[k]);
+            error = al_to_se_error(alGetError());
+#if DEBUG
+            fprintf(stderr, "wait_for_buffers unqueue %d\n", k);
+#endif
+            buffer_queued[k] = false;
+        }
+    }
+
+#endif
+
+#if DEBUG
+    if (error != SE_NO_ERROR) fprintf(stderr, "wait_for_buffers() = %s\n", sound_error_text(error));
 #endif
 
     return error;
@@ -544,4 +560,272 @@ void close_sound(void)
 
     init_OK = false;
 #endif
+}
+
+SoundError play_wav(const char *path)
+{
+#ifdef GPIO
+    return SE_INVALID_OPTION;
+    
+#else
+    WaveHeader header;
+    int16_t *file_data = NULL;
+    long file_size;
+    
+    SoundError error = read_wav(path, &header, &file_data, &file_size);
+
+#if DEBUG
+            fprintf(stderr, "wav file size %ld\n", file_size);
+#endif
+
+    if (error == SE_NO_ERROR) error = play_wav_data(&header, file_data, file_size);
+    
+    if (error == SE_NO_ERROR) error = wait_for_buffers();
+    
+    if (file_data != NULL) {
+        free(file_data);
+        file_data = NULL;
+    }
+
+#if DEBUG
+    if (error != SE_NO_ERROR) fprintf(stderr, "play_wav() = %s\n", sound_error_text(error));
+#endif
+
+    return error;
+#endif
+}
+
+SoundError read_wav(const char *path, WaveHeader *header, int16_t **file_data, long *file_size)
+{
+#ifdef GPIO
+    return SE_INVALID_OPTION;
+    
+#else
+    SoundError error = SE_NO_ERROR;
+    FILE *file = fopen(path, "r");
+    *file_data = NULL;
+    
+    if (file == NULL) error = SE_INPUT_FILE_OPEN_ERROR;
+    
+    if (error == SE_NO_ERROR) {
+        fseek(file, 0L, SEEK_END);
+        *file_size = ftell(file);
+        rewind(file);
+
+        if (*file_size < (long)sizeof(WaveHeader)) error = SE_INVALID_FILE_FORMAT;
+    }
+    
+    if (error == SE_NO_ERROR) {
+        if (1 != fread(header, sizeof(WaveHeader), 1, file)) error = SE_FILE_READ_ERROR;
+    }
+    
+    if (error == SE_NO_ERROR) {
+        if (header->file_size_minus_8 == 2147483684) {
+            fprintf(stderr, "patching file sizes\n");
+            
+            header->file_size_minus_8 = (uint32_t)*file_size - 8;
+            header->data_size = (uint32_t)*file_size - sizeof(WaveHeader);
+        }
+        
+#if DEBUG
+        /*
+        struct WaveHeader {
+            char label[4];
+            uint32_t file_size_minus_8;
+            char file_type[4];
+            char marker[4];
+            uint32_t length_so_far;
+            uint16_t format_type;
+            uint16_t channels;
+            uint32_t samples_per_second;
+            uint32_t bytes_per_second;
+            uint16_t bytes_per_sample;
+            uint16_t bits_per_sample_per_channel;
+            char data_header[4];
+            uint32_t data_size;
+        };
+        */
+        fprintf(stderr, "Header for %s\n", path);
+        fprintf(stderr, "label = %c%c%c%c\n", header->label[0], header->label[1], header->label[2], header->label[3]);
+        fprintf(stderr, "file_size_minus_8 = %u\n", header->file_size_minus_8);
+        fprintf(stderr, "file_type = %c%c%c%c\n", header->file_type[0], header->file_type[1], header->file_type[2], header->file_type[3]);
+        fprintf(stderr, "marker = %c%c%c%c\n", header->marker[0], header->marker[1], header->marker[2], header->marker[3]);
+        fprintf(stderr, "length_so_far = %u\n", header->length_so_far);
+        fprintf(stderr, "format_type = %d\n", (int)header->format_type);
+        fprintf(stderr, "channels = %d\n", (int)header->channels);
+        fprintf(stderr, "samples_per_second = %u\n", header->samples_per_second);
+        fprintf(stderr, "bytes_per_second = %u\n", header->bytes_per_second);
+        fprintf(stderr, "bytes_per_sample = %d\n", (int)header->bytes_per_sample);
+        fprintf(stderr, "bits_per_sample_per_channel = %d\n", (int)header->bits_per_sample_per_channel);
+        fprintf(stderr, "data_header = %c%c%c%c\n", header->data_header[0], header->data_header[1], header->data_header[2], header->data_header[3]);
+        fprintf(stderr, "data_size = %u\n", header->data_size);
+
+#endif
+        
+        bool ok = 0 == strncmp(header->label, "RIFF", 4);
+        ok = ok && 0 == strncmp(header->file_type, "WAVE", 4);
+        ok = ok && 0 == strncmp(header->marker, "fmt ", 4);
+        ok = ok && 1 == header->format_type;
+        ok = ok && 1 == header->channels;
+//        ok = ok && SAMPLES_PER_SECOND == header->samples_per_second;
+        ok = ok && 2 == header->bytes_per_sample;
+        ok = ok && 1 == header->channels;
+        ok = ok && 0 == strncmp(header->data_header, "data", 4);
+        ok = ok && (long long)*file_size >= (long long)sizeof(WaveHeader) + (long long)header->data_size;
+
+        if (!ok) error = SE_INVALID_FILE_FORMAT;
+    }
+    
+    if (error == SE_NO_ERROR) {
+        *file_data = (int16_t *)malloc((size_t)header->data_size);
+        if (*file_data == NULL) error = SE_OUT_OF_MEMORY;
+    }
+    
+    if (error == SE_NO_ERROR) {
+        if (header->data_size != fread(*file_data, 1, header->data_size, file)) {
+            error = SE_FILE_READ_ERROR;
+        }
+    }
+     
+    if (file != NULL) fclose(file);
+
+#if DEBUG
+    if (error != SE_NO_ERROR) fprintf(stderr, "read_wav() = %s\n", sound_error_text(error));
+#endif
+
+    return error;
+#endif
+}
+
+SoundError play_wav_data(WaveHeader *header, int16_t *file_data, long file_size)
+{
+#ifdef GPIO
+    return SE_INVALID_OPTION;
+    
+#else
+    
+#if 0
+    SoundError error = SE_NO_ERROR;
+
+    while (buffer_queued[current_buffer] && error == SE_NO_ERROR) {
+        // if current buffer is already queued, then they are all queued; need to wait to until
+        // current buffer (which is the oldest queued buffer) is done, so we can start
+        // filling it again
+        ALint processed = 0;
+        while (processed == 0 && error == SE_NO_ERROR) {
+            alGetSourcei(source, AL_BUFFERS_PROCESSED, &processed);
+            error = al_to_se_error(alGetError());
+        }
+
+        if (error == SE_NO_ERROR) {
+            alSourceUnqueueBuffers(source, 1, &buffers[current_buffer]);
+            error = al_to_se_error(alGetError());
+#if DEBUG
+            fprintf(stderr, "[%d] unqueue %d\n", processed, current_buffer);
+#endif
+        }
+
+        if (error == SE_NO_ERROR) {
+            alGetSourcei(source, AL_BUFFERS_PROCESSED, &processed);
+#if DEBUG
+            fprintf(stderr, "[%d]\n", processed);
+#endif
+            buffer_queued[current_buffer] = false;
+        }
+    }
+#else
+    SoundError error = wait_for_buffers();
+#endif
+
+    if (error == SE_NO_ERROR) {
+        // total - total number of samples
+        size_t total = header->data_size / header->bytes_per_sample;
+
+        // write entire file data into buffer
+        alBufferData(buffers[current_buffer], AL_FORMAT_MONO16, file_data,
+                     (ALsizei)total * sizeof(ALshort), header->samples_per_second);
+
+        error = al_to_se_error(alGetError());
+#if DEBUG
+        fprintf(stderr, "queue %d\n", current_buffer);
+#endif
+
+        if (error == SE_NO_ERROR) {
+            // queue buffer
+            alSourceQueueBuffers(source, 1, &buffers[current_buffer]);
+            buffer_queued[current_buffer] = true;
+            error = al_to_se_error(alGetError());
+        }
+
+        if (error == SE_NO_ERROR) {
+            ALint state;
+            alGetSourcei(source, AL_SOURCE_STATE, &state);
+            if (state != AL_PLAYING) {
+                // nothing is playing; either we haven't started yet, or we finished all
+                // queued buffers.
+
+                // make sure all except current buffer are unqueued
+                for (int k = 0; k < NUM_BUFFERS && error == SE_NO_ERROR; k++) {
+                    if (k != current_buffer && buffer_queued[k]) {
+                        alSourceUnqueueBuffers(source, 1, &buffers[k]);
+                        error = al_to_se_error(alGetError());
+#if DEBUG
+                        fprintf(stderr, "unqueue non-playing %d\n", k);
+#endif
+                        buffer_queued[k] = false;
+                    }
+                }
+
+                if (error == SE_NO_ERROR) {
+                    alSourcePlay(source);
+#if DEBUG
+                    fprintf(stderr, "play\n");
+#endif
+                    error = al_to_se_error(alGetError());
+                }
+            }
+        }
+
+        current_buffer = (current_buffer + 1) % NUM_BUFFERS;
+        data_offset = 0;
+    }
+
+#if DEBUG
+    if (error != SE_NO_ERROR) fprintf(stderr, "play_wav_data() = %s\n", sound_error_text(error));
+#endif
+
+    return error;
+#endif
+}
+
+const char *sound_error_text(SoundError error)
+{
+    switch(error) {
+        case SE_NO_ERROR:           return "SE_NO_ERROR";           break;
+        case SE_EXIT:               return "SE_EXIT";               break;
+        case SE_NO_DEVICE:          return "SE_NO_DEVICE";          break;
+        case SE_NO_CONTEXT:         return "SE_NO_CONTEXT";         break;
+        case SE_UNKNOWN:            return "SE_UNKNOWN";            break;
+        case SE_INVALID_NAME:       return "SE_INVALID_NAME";       break;
+        case SE_INVALID_ENUM:       return "SE_INVALID_ENUM";       break;
+        case SE_INVALID_VALUE:      return "SE_INVALID_VALUE";      break;
+        case SE_INVALID_OPERATION:  return "SE_INVALID_OPERATION";  break;
+        case SE_OUT_OF_MEMORY:      return "SE_OUT_OF_MEMORY";      break;
+        case SE_INVALID_FREQUENCY:  return "SE_INVALID_FREQUENCY";  break;
+        case SE_INVALID_WPM:        return "SE_INVALID_WPM";        break;
+        case SE_INVALID_BPM:        return "SE_INVALID_BPM";        break;
+        case SE_INVALID_MIDI:       return "SE_INVALID_MIDI";       break;
+        case SE_INVALID_NOTE:       return "SE_INVALID_NOTE";       break;
+        case SE_INVALID_TIME:       return "SE_INVALID_TIME";       break;
+        case SE_INVALID_GAP:        return "SE_INVALID_GAP";        break;
+        case SE_INVALID_OPTION:     return "SE_INVALID_OPTION";     break;
+        case SE_INVALID_REPEATS:    return "SE_INVALID_REPEATS";    break;
+        case SE_FILE_READ_ERROR:    return "SE_FILE_READ_ERROR";                    break;
+        case SE_INPUT_FILE_OPEN_ERROR:      return "SE_INPUT_FILE_OPEN_ERROR";      break;
+        case SE_OUTPUT_FILE_OPEN_ERROR:     return "SE_OUTPUT_FILE_OPEN_ERROR";     break;
+        case SE_FILE_ALREADY_OPEN_ERROR:    return "SE_FILE_ALREADY_OPEN_ERROR";    break;
+        case SE_FILE_WRITE_ERROR:           return "SE_FILE_WRITE_ERROR";           break;
+        case SE_INVALID_FILE_FORMAT:        return "SE_INVALID_FILE_FORMAT";        break;
+        default:                            return "SE_UNKNOWN";                    break;
+    }
 }

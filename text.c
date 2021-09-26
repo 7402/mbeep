@@ -2,7 +2,7 @@
 // text.c
 // mbeep
 //
-// Copyright (C) 2018-2021 Michael Budiansky. All rights reserved.
+// Copyright (C) 2018-21 Michael Budiansky. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are permitted
 // provided that the following conditions are met:
@@ -32,7 +32,7 @@
 
 void version(void)
 {
-    printf("mbeep 0.9.7\n");
+    printf("mbeep 0.9.8\n");
 }
 
 void usage(void)
@@ -68,6 +68,7 @@ void usage(void)
            "  -x <speed>        Character speed for Farnsworth Morse code timing\n"
            "  --wss <speed>     Word speed with extra space between words\n"
            "  -i <input>        Input file or path for text used by -m or -c options\n"
+           "  --play <file>     Play .wav file written by mbeep (for testing)\n"
            "  -I                Use stdin for text used by -m or -c options\n"
            "  -m <string>       Send sequence of MIDI notes specified by string\n"
            "  -m                Send sequence of MIDI notes specified by input file\n"
@@ -341,6 +342,10 @@ void man_page_source(void)
            ".TP\n"
            ".BR \\-i \" \" \\fIINPUT\\fR\n"
            "Input file or path for text used by -m or -c options.\n"
+           "\n"
+           ".TP\n"
+           ".BR \\-\\-play\n"
+           "Play .wav file written by mbeep (for testing).\n"
            "\n"
            ".TP\n"
            ".BR \\-I\n"
