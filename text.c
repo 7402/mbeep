@@ -2,7 +2,7 @@
 // text.c
 // mbeep
 //
-// Copyright (C) 2018-21 Michael Budiansky. All rights reserved.
+// Copyright (C) 2018-23 Michael Budiansky. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are permitted
 // provided that the following conditions are met:
@@ -32,7 +32,7 @@
 
 void version(void)
 {
-    printf("mbeep 0.9.8\n");
+    printf("mbeep 0.9.9\n");
 }
 
 void usage(void)
@@ -216,7 +216,7 @@ void morse_help(void)
 
 void license(void)
 {
-    printf("Copyright (C) 2018-2021 Michael Budiansky. All rights reserved.\n"
+    printf("Copyright (C) 2018-2023 Michael Budiansky. All rights reserved.\n"
            "\n"
            "Redistribution and use in source and binary forms, with or without modification, are permitted\n"
            "provided that the following conditions are met:\n"

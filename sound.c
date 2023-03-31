@@ -2,7 +2,7 @@
 // sound.c
 // mbeep
 //
-// Copyright (C) 2018-21 Michael Budiansky. All rights reserved.
+// Copyright (C) 2018-23 Michael Budiansky. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are permitted
 // provided that the following conditions are met:
@@ -31,11 +31,15 @@
 #include <string.h>
 
 #ifdef __APPLE__
+    // first deprecated in macOS 10.15 - OpenAL is deprecated in favor of AVAudioEngine
+    // suppress warnings:
+    #define OPENAL_DEPRECATED
+    
     #include <OpenAL/al.h>
     #include <OpenAL/alc.h>
 #else
     #ifdef GPIO
-        #include <wiringPi.h>
+        #include "tiny_gpio.h"
     #else
         #include <AL/al.h>
         #include <AL/alc.h>
@@ -94,8 +98,9 @@ SoundError init_sound(void)
     SoundError error = SE_NO_ERROR;
 
 #ifdef GPIO
-    wiringPiSetupGpio();
-    pinMode(GPIO, OUTPUT);
+    if (gpioInitialise() == 0) {
+    	gpioSetMode(GPIO, PI_OUTPUT);
+    }
 
 #else
 
@@ -172,14 +177,14 @@ SoundError fill_buffer(double freq, double msec)
         clock_gettime(CLOCK_MONOTONIC, &ts);
 
         for (long k = 0; k < cycles; k++) {
-            digitalWrite(GPIO, 1);
+        	gpioWrite(GPIO, 1);
 
             ts.tv_nsec += nsec_per_half_cycle;
             ts.tv_sec += ts.tv_nsec / LONG_1E9;
             ts.tv_nsec = ts.tv_nsec % LONG_1E9;
             clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &ts, NULL);
 
-            digitalWrite(GPIO, 0);
+        	gpioWrite(GPIO, 0);
 
             ts.tv_nsec += nsec_per_half_cycle;
             ts.tv_sec += ts.tv_nsec / LONG_1E9;
@@ -481,6 +486,8 @@ SoundError play_buffers(void)
 
 bool sound_playing(void)
 {
+#ifndef GPIO
+
     ALint value;
     
     alGetSourcei(source, AL_SOURCE_STATE, &value);
@@ -489,6 +496,10 @@ bool sound_playing(void)
     bool playing = error == SE_NO_ERROR && value == AL_PLAYING;
 
     return playing;
+
+#else
+	return false;
+#endif
 }
 
 // if any buffers are playing, wait until playing stops

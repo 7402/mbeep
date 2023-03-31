@@ -59,7 +59,7 @@ make
 sudo make install
 ```
 
-* Raspbian Stretch
+* Raspbian Bullseye
 
 ```
 sudo apt-get install libopenal-dev
@@ -69,7 +69,7 @@ make
 sudo make install
 ```
 
-* Raspbian Stretch with GPIO patch
+* Raspbian Bullseye with GPIO patch
 
 ```
 cd path_to_directory
